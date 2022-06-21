@@ -1,0 +1,18 @@
+# IDE excludes
+.idea
+.vscode
+nbproject
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/framework-bundle ###
+/tests/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpstan/phpstan ###
+/.phpstan-cache/
+###< phpstan/phpstan ###

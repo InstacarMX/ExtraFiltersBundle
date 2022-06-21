@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services">
+    <services>
+        <prototype namespace="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\" resource="../../Doctrine/Orm/Expression/*" autoconfigure="true" autowire="true"/>
+        <prototype namespace="Instacar\ExtraFiltersBundle\Doctrine\Orm\Generator\" resource="../../Doctrine/Orm/Generator/*" autoconfigure="true" autowire="true"/>
+
+        <service id="instacar.extra_filters.orm.expression_language" class="Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage">
+            <argument type="tagged_iterator" tag="instacar.extra_filters.doctrine.orm.expression_provider"/>
+        </service>
+    </services>
+</container>
