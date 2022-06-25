@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 class AndExpression extends AbstractDoctrineOrmExpression
 {
-    static protected string $name = 'andWhere';
+    protected static string $name = 'andWhere';
 
     public function process(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Andx
     {

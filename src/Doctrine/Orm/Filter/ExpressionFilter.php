@@ -56,8 +56,14 @@ class ExpressionFilter extends AbstractContextAwareFilter
         return $description;
     }
 
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        string $operationName = null
+    ): void {
         if (
             null === $value ||
             ($expression = $this->properties[$property] ?? null) === null
@@ -66,7 +72,10 @@ class ExpressionFilter extends AbstractContextAwareFilter
         }
 
         try {
-            $this->ormExpressionLanguage->lint($expression, ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operationName']);
+            $this->ormExpressionLanguage->lint(
+                $expression,
+                ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operationName'],
+            );
         } catch (SyntaxError $e) {
             $this->logger->notice('Invalid filter ignored', ['exception' => $e]);
 

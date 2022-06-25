@@ -12,7 +12,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 abstract class AbstractDoctrineOrmExpression implements ExpressionFunctionProviderInterface, DoctrineOrmExpressionInterface
 {
-    static protected string $name;
+    protected static string $name;
 
     protected ManagerRegistry $managerRegistry;
     protected LoggerInterface $logger;
@@ -27,11 +27,16 @@ abstract class AbstractDoctrineOrmExpression implements ExpressionFunctionProvid
         return [
             new ExpressionFunction(
                 static::$name,
-                static function(...$expressions) {
+                static function (...$expressions) {
                     return sprintf('%s(%s)', self::$name, implode($expressions));
                 },
                 function ($arguments, ...$expressions) {
-                    return $this->process($expressions, $arguments['queryBuilder'], $arguments['resourceClass'], $arguments['operationName']);
+                    return $this->process(
+                        $expressions,
+                        $arguments['queryBuilder'],
+                        $arguments['resourceClass'],
+                        $arguments['operationName'],
+                    );
                 },
             ),
         ];

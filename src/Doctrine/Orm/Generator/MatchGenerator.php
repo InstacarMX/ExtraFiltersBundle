@@ -27,8 +27,13 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
     private IdentifiersExtractorInterface $identifiersExtractor;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, IdentifiersExtractorInterface $identifiersExtractor, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        IriConverterInterface $iriConverter,
+        IdentifiersExtractorInterface $identifiersExtractor,
+        PropertyAccessorInterface $propertyAccessor = null,
+        LoggerInterface $logger = null
+    ) {
         parent::__construct($managerRegistry, $logger);
 
         $this->iriConverter = $iriConverter;
@@ -36,8 +41,15 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    public function process(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?string $operationName, ...$parameters)
-    {
+    public function process(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?string $operationName,
+        ...$parameters
+    ) {
         if (
             null === $value ||
             !$this->isPropertyMapped($property, $resourceClass, true)
@@ -55,7 +67,13 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field, $associations] = $this->addJoinsForNestedProperty(
+                $property,
+                $alias,
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass
+            );
         }
 
         $caseSensitive = true;
@@ -76,7 +94,10 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                    'exception' => new InvalidArgumentException(sprintf(
+                        'Values for field "%s" are not valid according to the doctrine type.',
+                        $field,
+                    )),
                 ]);
 
                 return null;
@@ -98,7 +119,10 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                'exception' => new InvalidArgumentException(sprintf(
+                    'Values for field "%s" are not valid according to the doctrine type.',
+                    $field,
+                )),
             ]);
 
             return null;
@@ -111,7 +135,15 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
             $associationField = $associationFieldIdentifier;
         }
 
-        return $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
+        return $this->addWhereByStrategy(
+            $strategy,
+            $queryBuilder,
+            $queryNameGenerator,
+            $associationAlias,
+            $associationField,
+            $values,
+            $caseSensitive,
+        );
     }
 
     /**
@@ -127,14 +159,21 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
      * @return Expr\Orx|Expr\Func|Expr\Comparison
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive)
-    {
+    protected function addWhereByStrategy(
+        string $strategy,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $alias,
+        string $field,
+        $values,
+        bool $caseSensitive
+    ) {
         if (!is_array($values)) {
             $values = [$values];
         }
 
         $wrapCase = $this->createWrapCase($caseSensitive);
-        $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
+        $valueParameter = ':' . $queryNameGenerator->generateParameterName($field);
         $aliasedField = sprintf('%s.%s', $alias, $field);
 
         if (!$strategy || self::STRATEGY_EXACT === $strategy) {
@@ -179,8 +218,14 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
                 case self::STRATEGY_WORD_START:
                     $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string)$queryBuilder->expr()->concat($keyValueParameter, "'%'"))),
-                        $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string)$queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'")))
+                        $queryBuilder->expr()->like(
+                            $wrapCase($aliasedField),
+                            $wrapCase((string)$queryBuilder->expr()->concat($keyValueParameter, "'%'"))
+                        ),
+                        $queryBuilder->expr()->like(
+                            $wrapCase($aliasedField),
+                            $wrapCase((string)$queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'"))
+                        ),
                     );
                     break;
 

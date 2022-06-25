@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 class OrExpression extends AbstractDoctrineOrmExpression
 {
-    static protected string $name = 'orWhere';
+    protected static string $name = 'orWhere';
 
     public function process(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Orx
     {

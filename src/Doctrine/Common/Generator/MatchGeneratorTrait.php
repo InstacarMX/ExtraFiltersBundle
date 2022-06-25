@@ -57,7 +57,10 @@ trait MatchGeneratorTrait
 
         if (empty($values)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+                'exception' => new InvalidArgumentException(sprintf(
+                    'At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format',
+                    $property,
+                )),
             ]);
 
             return null;
@@ -75,7 +78,11 @@ trait MatchGeneratorTrait
     protected function hasValidValues(array $values, $type = null): bool
     {
         foreach ($values as $value) {
-            if (null !== $value && in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {
+            if (
+                null !== $value
+                && in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true)
+                && false === filter_var($value, \FILTER_VALIDATE_INT)
+            ) {
                 return false;
             }
         }

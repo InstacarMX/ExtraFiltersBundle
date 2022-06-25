@@ -11,7 +11,8 @@ class ExpressionLanguage extends BaseExpressionLanguage
     /**
      * @param iterable<ExpressionFunctionProviderInterface> $providers
      */
-    public function __construct(iterable $providers) {
+    public function __construct(iterable $providers)
+    {
         $providers = $providers instanceof \Traversable ? iterator_to_array($providers) : (array) $providers;
 
         parent::__construct(null, $providers);

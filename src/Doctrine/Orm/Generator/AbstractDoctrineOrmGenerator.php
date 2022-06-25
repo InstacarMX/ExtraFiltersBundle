@@ -18,7 +18,7 @@ abstract class AbstractDoctrineOrmGenerator implements ExpressionFunctionProvide
     use OrmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    static protected string $name;
+    protected static string $name;
 
     protected ManagerRegistry $managerRegistry;
     protected LoggerInterface $logger;
@@ -34,11 +34,19 @@ abstract class AbstractDoctrineOrmGenerator implements ExpressionFunctionProvide
         return [
             new ExpressionFunction(
                 static::$name,
-                static function(string $property, ...$parameters) {
+                static function (string $property, ...$parameters) {
                     return sprintf('%s(%s)', self::$name, implode([$property, ...$parameters]));
                 },
                 function ($arguments, string $property, ...$parameters) {
-                    return $this->process($property, $arguments['value'], $arguments['queryBuilder'], $arguments['queryNameGenerator'], $arguments['resourceClass'], $arguments['operationName'], ...$parameters);
+                    return $this->process(
+                        $property,
+                        $arguments['value'],
+                        $arguments['queryBuilder'],
+                        $arguments['queryNameGenerator'],
+                        $arguments['resourceClass'],
+                        $arguments['operationName'],
+                        ...$parameters,
+                    );
                 },
             ),
         ];
@@ -54,7 +62,15 @@ abstract class AbstractDoctrineOrmGenerator implements ExpressionFunctionProvide
      * @param mixed[] ...$parameters
      * @return Expr\Comparison|Expr\Func|Expr\Orx|null
      */
-    abstract public function process(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?string $operationName, ...$parameters);
+    abstract public function process(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?string $operationName,
+        ...$parameters
+    );
 
     protected function getManagerRegistry(): ManagerRegistry
     {
