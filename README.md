@@ -33,7 +33,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```shell
-composer require instacar/extra-filters-bundle
+composer require instacar/extra-filters-bundle:dev-main
 ```
 
 #### Step 2: Enable the Bundle
@@ -95,7 +95,7 @@ These are the list of the ideas that I have for this bundle. If you have another
 - Implement all the API Platform and the user's filters throughout a decorated Query Builder (without rewrite it).
 
 ## Licensing
-This bundle is licensed under the GNU GPLv3. For a quick resume of the permissions with this license see the
+This bundle is licensed under the GNU LGPLv3. For a quick resume of the permissions with this license see the
 [GNU LGPLv3](https://choosealicense.com/licenses/lgpl-3.0/) in [choosealicense.com](https://choosealicense.com).
 
 See the [LICENSE](LICENSE.md) file for more details.

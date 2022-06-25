@@ -3,6 +3,9 @@
 .vscode
 nbproject
 
+# Library excludes
+composer.lock
+
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
 /phpunit.xml
