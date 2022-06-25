@@ -14,6 +14,7 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  * )
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
  *     "search"="orWhere(match('name', 'ipartial'), match('author.name', 'ipartial'), match('year', 'exact'))",
+ *     "exclude"="notWhere(orWhere(match('name', 'ipartial'), match('author.name', 'ipartial')))"
  * })
  * @ORM\Entity()
  */

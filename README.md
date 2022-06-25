@@ -83,17 +83,16 @@ Currently, the operations supported in the expression are:
 - **match:** Equal to the filter "SearchFilter".
 - **andWhere:** Equal to the SQL operator "AND".
 - **orWhere:** Equal to the SQL operator "OR".
+- **notWhere:** Equal to the SQL operator "NOT".
 - and all the operations for the [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language/syntax.html).
 
 ## Limitations
 - It only has the "match" filter (a copy of the SearchFilter for API Platform).
 - It does not generate a tailored documentation for API Platform, it only generates a generic property with the "string" value.
-- It does not support the operator "NOT".
 
 ## Future work
 These are the list of the ideas that I have for this bundle. If you have another idea, let me know in the "Issues" tab.
 - Implement all the API Platform and the user's filters throughout a decorated Query Builder (without rewrite it).
-- Implement the operator "NOT" to negate any expression.
 
 ## Licensing
 This bundle is licensed under the GNU GPLv3. For a quick resume of the permissions with this license see the
