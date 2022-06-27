@@ -43,12 +43,13 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
     public function process(
         string $property,
+        ?string $strategy,
+        array $parameters,
         $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        ?string $operationName,
-        ...$parameters
+        ?string $operationName
     ) {
         if (
             null === $value ||
@@ -77,7 +78,7 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
         }
 
         $caseSensitive = true;
-        $strategy = $parameters[0] ?? self::STRATEGY_EXACT;
+        $strategy = $strategy ?? self::STRATEGY_EXACT;
 
         // prefixing the strategy with i makes it case insensitive
         if (str_starts_with($strategy, 'i')) {
@@ -231,7 +232,7 @@ class MatchGenerator extends AbstractDoctrineOrmGenerator implements SearchFilte
 
                 default:
                     throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
-            };
+            }
         }
 
         array_walk($parameters, [$queryBuilder, 'setParameter']);

@@ -64,10 +64,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
         string $resourceClass,
         string $operationName = null
     ): void {
-        if (
-            null === $value ||
-            ($expression = $this->properties[$property] ?? null) === null
-        ) {
+        if (($expression = $this->properties[$property] ?? null) === null) {
             return;
         }
 

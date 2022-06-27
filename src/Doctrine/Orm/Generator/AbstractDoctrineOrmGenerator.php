@@ -34,18 +34,19 @@ abstract class AbstractDoctrineOrmGenerator implements ExpressionFunctionProvide
         return [
             new ExpressionFunction(
                 static::$name,
-                static function (string $property, ...$parameters) {
-                    return sprintf('%s(%s)', self::$name, implode([$property, ...$parameters]));
+                static function (string $property, ?string $strategy = null, array $parameters = []) {
+                    return sprintf('%s(%s)', static::$name, implode([$property, $strategy, ...$parameters]));
                 },
-                function ($arguments, string $property, ...$parameters) {
+                function ($arguments, string $property, ?string $strategy = null, array $parameters = []) {
                     return $this->process(
                         $property,
+                        $strategy,
+                        $parameters,
                         $arguments['value'],
                         $arguments['queryBuilder'],
                         $arguments['queryNameGenerator'],
                         $arguments['resourceClass'],
                         $arguments['operationName'],
-                        ...$parameters,
                     );
                 },
             ),
@@ -54,22 +55,24 @@ abstract class AbstractDoctrineOrmGenerator implements ExpressionFunctionProvide
 
     /**
      * @param string $property
+     * @param string|null $strategy
+     * @param mixed[] $parameters
      * @param mixed $value
      * @param QueryBuilder $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string $resourceClass
      * @param string|null $operationName
-     * @param mixed[] ...$parameters
      * @return Expr\Comparison|Expr\Func|Expr\Orx|null
      */
     abstract public function process(
         string $property,
+        ?string $strategy,
+        array $parameters,
         $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        ?string $operationName,
-        ...$parameters
+        ?string $operationName
     );
 
     protected function getManagerRegistry(): ManagerRegistry
