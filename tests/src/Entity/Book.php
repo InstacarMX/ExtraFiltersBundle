@@ -4,6 +4,7 @@ namespace Instacar\ExtraFiltersBundle\Test\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
@@ -12,9 +13,14 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  *     collectionOperations={"get"},
  *     itemOperations={"get"},
  * )
+ * @ApiFilter(filterClass=SearchFilter::class, properties={
+ *     "name"="ipartial",
+ *     "author.name"="ipartial",
+ *     "year"="exact",
+ * })
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
- *     "search"="orWhere(match('name', 'ipartial'), match('author.name', 'ipartial'), match('year', 'exact'))",
- *     "exclude"="notWhere(orWhere(match('name', 'ipartial'), match('author.name', 'ipartial')))"
+ *     "search"="orWhere(search('name'), search('author.name'), search('year'))",
+ *     "exclude"="notWhere(orWhere(search('name'), search('author.name')))"
  * })
  * @ORM\Entity()
  */
