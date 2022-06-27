@@ -51,7 +51,7 @@ return [
 
 ## Usage
 You can implement the filter just as any filter in API Platform (keep in mind that this filter is for advanced 
-user-cases, if you can implement a normal filter from API Platform, use it).
+use-cases, if you can implement a normal filter from API Platform, use it).
 
 ```php
 // src/Entity/Book.php
@@ -73,18 +73,28 @@ class Book {
 
 The expression syntax are the following:
 ```php
-['filter-property' => 'operator(filter1(property, strategy), filter2(property, strategy), ..., filterN(property, strategy))'];
+['filter-property' => 'operator(filter1(property, strategy, arguments), filter2(property, strategy, arguments), ..., filterN(property, strategy, arguments))'];
 ```
 
-You can use the variable "property" (that contains the filter property name) if you want to use the same name for 
-filter the entity, and the variable "value" for manipulate the filter value.
+Where:
+- **filter-property:** The property used for filter in your API. You can use a virtual property (a property that is not
+  present in your entity).
+- **operator:** A [supported operator](#supported-operators).
+- **filter:** A [supported filter](#supported-filters).
+- **property:** The name of the property from the entity. You can use "property" if you want to use the same name from
+  the filter-property.
+- **strategy:** The strategy from the documented values in the filter's documentation. Optional. You can use "null" for
+  use the follow parameter.
+- **arguments:** The arguments in form of "[array]" or "{key: value}". Same as the "arguments" property from API 
+  Platform filter attribute. Optional.
 
-Currently, the operations supported in the expression are:
-- **match:** Equal to the filter "SearchFilter".
+### Supported operators
 - **andWhere:** Equal to the SQL operator "AND".
 - **orWhere:** Equal to the SQL operator "OR".
 - **notWhere:** Equal to the SQL operator "NOT".
-- and all the operations for the [Symfony Expression Language](https://symfony.com/doc/current/components/expression_language/syntax.html).
+
+### Supported filters
+- **match:** Equal to the filter "SearchFilter".
 
 ## Limitations
 - It only has the "match" filter (a copy of the SearchFilter for API Platform).
