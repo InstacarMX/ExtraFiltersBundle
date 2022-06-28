@@ -58,6 +58,9 @@ class Kernel extends BaseKernel
                 'mapping' => [
                     'paths' => ['%kernel.project_dir%/src/Entity'],
                 ],
+                'formats' => [
+                    'json' => ['application/json'],
+                ],
             ]);
         });
     }

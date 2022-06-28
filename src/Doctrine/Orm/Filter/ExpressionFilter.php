@@ -81,7 +81,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
     {
         $description = [];
 
-        foreach ($this->properties as $property) {
+        foreach ($this->properties as $property => $unused) {
             $description[$property] = [
                 'property' => null,
                 'required' => false,

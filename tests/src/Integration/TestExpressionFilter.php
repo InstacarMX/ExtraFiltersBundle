@@ -18,6 +18,112 @@ class TestExpressionFilter extends ApiTestCase
         $this->databaseTool = $databaseTool->get();
     }
 
+    public function testDocumentation(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/docs', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonContains([
+            'paths' => [
+                '/books' => [
+                    'get' => [
+                        'parameters' => [
+                            [
+                                'name' => 'availableStart[before]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableStart[strictly_before]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableStart[after]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableStart[strictly_after]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableEnd[before]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableEnd[strictly_before]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableEnd[after]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'availableEnd[strictly_after]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'name',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'author.name',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'search',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'exclude',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'available',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'description' => 'The collection page number',
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ]
+                ]
+            ]
+        ]);
+    }
+
     public function testSearchExpressionFilter(): void
     {
         $this->databaseTool->loadFixtures([
