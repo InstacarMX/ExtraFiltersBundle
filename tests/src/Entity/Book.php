@@ -4,6 +4,9 @@ namespace Instacar\ExtraFiltersBundle\Test\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
@@ -13,14 +16,18 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  *     collectionOperations={"get"},
  *     itemOperations={"get"},
  * )
+ * @ApiFilter(filterClass=DateFilter::class, properties={
+ *     "availableStart"=DateFilterInterface::EXCLUDE_NULL,
+ *     "availableEnd"=DateFilterInterface::EXCLUDE_NULL,
+ * })
  * @ApiFilter(filterClass=SearchFilter::class, properties={
- *     "name"="ipartial",
- *     "author.name"="ipartial",
- *     "year"="exact",
+ *     "name"=SearchFilterInterface::STRATEGY_PARTIAL,
+ *     "author.name"=SearchFilterInterface::STRATEGY_PARTIAL,
  * })
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
- *     "search"="orWhere(search('name'), search('author.name'), search('year'))",
- *     "exclude"="notWhere(orWhere(search('name'), search('author.name')))"
+ *     "search"="orWhere(search('name'), search('author.name'))",
+ *     "exclude"="notWhere(orWhere(search('name'), search('author.name')))",
+ *     "available"="andWhere(date('availableStart', {before: value}), date('availableEnd', {after: value}))",
  * })
  * @ORM\Entity()
  */
@@ -39,9 +46,14 @@ class Book
     private string $name;
 
     /**
-     * @ORM\Column(type="string", length=4)
+     * @ORM\Column(type="date")
      */
-    private string $year;
+    private \DateTimeInterface $availableStart;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private \DateTimeInterface $availableEnd;
 
     /**
      * @ORM\ManyToOne()
@@ -49,10 +61,11 @@ class Book
      */
     private Author $author;
 
-    public function __construct(string $name, string $year, Author $author)
+    public function __construct(string $name, \DateTimeInterface $availableDateStart, \DateTimeInterface $availableDateEnd, Author $author)
     {
         $this->name = $name;
-        $this->year = $year;
+        $this->availableStart = $availableDateStart;
+        $this->availableEnd = $availableDateEnd;
         $this->author = $author;
     }
 
@@ -71,14 +84,24 @@ class Book
         $this->name = $name;
     }
 
-    public function getYear(): string
+    public function getAvailableStart(): \DateTimeInterface
     {
-        return $this->year;
+        return $this->availableStart;
     }
 
-    public function setYear(string $year): void
+    public function setAvailableStart(\DateTimeInterface $availableStart): void
     {
-        $this->year = $year;
+        $this->availableStart = $availableStart;
+    }
+
+    public function getAvailableEnd(): \DateTimeInterface
+    {
+        return $this->availableEnd;
+    }
+
+    public function setAvailableEnd(\DateTimeInterface $availableEnd): void
+    {
+        $this->availableEnd = $availableEnd;
     }
 
     public function getAuthor(): Author

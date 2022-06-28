@@ -33,11 +33,11 @@ class FilterExpressionProvider implements ExpressionFunctionProviderInterface
                 function (string $property, ?string $strategy = null, array $parameters = []) use ($name) {
                     return sprintf('%s(%s)', $name, implode([$property, $strategy, ...$parameters]));
                 },
-                function ($arguments, string $property) use ($filter) {
+                function ($arguments, string $property = null, $value = null) use ($filter) {
                     return $this->process(
                         $filter,
-                        $property,
-                        $arguments['value'],
+                        $property ?? $arguments['property'],
+                        $value ?? $arguments['value'],
                         $arguments['queryBuilder'],
                         $arguments['queryNameGenerator'],
                         $arguments['resourceClass'],

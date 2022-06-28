@@ -18,7 +18,6 @@ class TestExpressionFilter extends ApiTestCase
         $this->databaseTool = $databaseTool->get();
     }
 
-
     public function testSearchExpressionFilter(): void
     {
         $this->databaseTool->loadFixtures([
@@ -36,7 +35,8 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
-                'year' => '2021',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
             ],
         ]);
@@ -50,13 +50,15 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
-                'year' => '2022',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
-                'year' => '2022',
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
         ]);
@@ -79,13 +81,15 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
-                'year' => '2022',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
-                'year' => '2022',
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
         ]);
@@ -99,8 +103,64 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
-                'year' => '2021',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+            ],
+        ]);
+    }
+
+    public function testAvailableExpressionFilters(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?available=2022-01-15', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+        ]);
+    }
+
+    public function testCombinedFilters(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?search=jane&exclude=symfony', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
             ],
         ]);
     }
