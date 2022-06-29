@@ -2,15 +2,11 @@
 
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,18 +14,13 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 class ExpressionFilter extends AbstractContextAwareFilter
 {
+    private ExpressionLanguageFactory $expressionLanguageFactory;
+
     private ExpressionLanguage $expressionLanguage;
-
-    /** @var FilterCollection|ContainerInterface */
-    private $filterLocator;
-
-    private ResourceMetadataFactoryInterface $resourceMetadataFactory;
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param ExpressionLanguage $expressionLanguage
-     * @param ContainerInterface|FilterCollection $filterLocator
-     * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param ExpressionLanguageFactory $expressionLanguageFactory
      * @param RequestStack|null $requestStack
      * @param LoggerInterface|null $logger
      * @param array<string, string>|null $properties
@@ -37,9 +28,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
-        ExpressionLanguage $expressionLanguage,
-        $filterLocator,
-        ResourceMetadataFactoryInterface $resourceMetadataFactory,
+        ExpressionLanguageFactory $expressionLanguageFactory,
         ?RequestStack $requestStack = null,
         LoggerInterface $logger = null,
         array $properties = null,
@@ -47,9 +36,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
     ) {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
-        $this->expressionLanguage = $expressionLanguage;
-        $this->filterLocator = $filterLocator;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->expressionLanguageFactory = $expressionLanguageFactory;
     }
 
     /**
@@ -66,8 +53,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
         string $operationName = null,
         array $context = []
     ): void {
-        $filters = $this->getFilters($resourceClass, $operationName);
-        $this->expressionLanguage->registerProvider(new FilterExpressionProvider($filters));
+        $this->expressionLanguage = $this->expressionLanguageFactory->provide($resourceClass, $operationName);
 
         parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
     }
@@ -127,30 +113,5 @@ class ExpressionFilter extends AbstractContextAwareFilter
             'context' => $context,
         ]);
         $queryBuilder->andWhere($queryExpression);
-    }
-
-    /**
-     * @param string $resourceClass
-     * @param string $operationName
-     * @return ContextAwareFilterInterface[]
-     */
-    private function getFilters(string $resourceClass, string $operationName): array
-    {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-
-        $filters = [];
-        foreach ($resourceFilters as $filterId) {
-            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
-
-            if ($filter === $this) {
-                break;
-            }
-            if ($filter instanceof ContextAwareFilterInterface) {
-                $filters[$filterId] = $filter;
-            }
-        }
-
-        return $filters;
     }
 }

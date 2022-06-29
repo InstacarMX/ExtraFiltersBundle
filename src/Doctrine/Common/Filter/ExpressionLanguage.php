@@ -9,12 +9,10 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLan
 class ExpressionLanguage extends BaseExpressionLanguage
 {
     /**
-     * @param iterable<ExpressionFunctionProviderInterface> $providers
+     * @param ExpressionFunctionProviderInterface[] $providers
      */
-    public function __construct(iterable $providers)
+    public function __construct(array $providers)
     {
-        $providers = $providers instanceof \Traversable ? iterator_to_array($providers) : (array) $providers;
-
         parent::__construct(null, $providers);
     }
 

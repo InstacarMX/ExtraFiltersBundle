@@ -6,36 +6,28 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
+use Instacar\ExtraFiltersBundle\Util\StringUtil;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
-class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
+class ExpressionProviderFilterAdapter implements DoctrineOrmExpressionProviderInterface
 {
-    /**
-     * @var ContextAwareFilterInterface[]
-     */
-    private array $filters;
+    private ContextAwareFilterInterface $filter;
 
-    /**
-     * @param ContextAwareFilterInterface[] $filters
-     */
-    public function __construct(array $filters)
+    public function __construct(ContextAwareFilterInterface $filter)
     {
-        $this->filters = $filters;
+        $this->filter = $filter;
     }
 
     public function getFunctions(): array
     {
-        return array_map(function (ContextAwareFilterInterface $filter) {
-            $name = self::normalizeFilterName(get_class($filter));
-
-            return new ExpressionFunction(
-                $name,
+        return [
+            new ExpressionFunction(
+                self::normalizeFilterName(get_class($this->filter)),
                 static function () {
                     // Uncompilable
                 },
-                function ($arguments, string $property = null, $value = null) use ($filter) {
+                function ($arguments, string $property = null, $value = null) {
                     return $this->process(
-                        $filter,
                         $property ?? $arguments['property'],
                         $value ?? $arguments['value'],
                         $arguments['queryBuilder'],
@@ -45,12 +37,11 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
                         $arguments['context'],
                     );
                 },
-            );
-        }, $this->filters);
+            ),
+        ];
     }
 
     /**
-     * @param ContextAwareFilterInterface $filter
      * @param string $property
      * @param mixed $value
      * @param QueryBuilder $queryBuilder
@@ -61,7 +52,6 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
      * @return mixed
      */
     private function process(
-        ContextAwareFilterInterface $filter,
         string $property,
         $value,
         QueryBuilder $queryBuilder,
@@ -76,7 +66,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
 
         // Bootstrap the context
         $context['filters'] = [$property => $value];
-        $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        $this->filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 
         // Save the generated expression from the filter and restore the where clause
         $expression = $queryBuilder->getDQLPart('where');
@@ -87,13 +77,10 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
 
     private static function normalizeFilterName(string $className): string
     {
-        $prefix = 'filter';
         $classNamespace = explode('\\', $className);
-        $className = strtolower($classNamespace[count($classNamespace) - 1]);
-        if (str_ends_with($className, $prefix)) {
-            return substr($className, 0, strlen($className) - strlen($prefix));
-        }
+        $shortName = $classNamespace[count($classNamespace) - 1];
+        $shortName = StringUtil::removeSuffix($shortName, 'Filter');
 
-        return $className;
+        return lcfirst($shortName);
     }
 }
