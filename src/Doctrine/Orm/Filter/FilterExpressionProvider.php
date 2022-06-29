@@ -5,10 +5,10 @@ namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
+use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
-class FilterExpressionProvider implements ExpressionFunctionProviderInterface
+class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
 {
     /**
      * @var ContextAwareFilterInterface[]
@@ -30,8 +30,8 @@ class FilterExpressionProvider implements ExpressionFunctionProviderInterface
 
             return new ExpressionFunction(
                 $name,
-                function (string $property, ?string $strategy = null, array $parameters = []) use ($name) {
-                    return sprintf('%s(%s)', $name, implode([$property, $strategy, ...$parameters]));
+                static function () {
+                    // Uncompilable
                 },
                 function ($arguments, string $property = null, $value = null) use ($filter) {
                     return $this->process(

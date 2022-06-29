@@ -3,13 +3,10 @@
 namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
-use Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionInterface;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
+use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class InstacarExtraFiltersExtension extends Extension
@@ -38,12 +35,7 @@ class InstacarExtraFiltersExtension extends Extension
 
         $loader->load('orm.xml');
 
-        $container->registerForAutoconfiguration(DoctrineOrmExpressionInterface::class)
+        $container->registerForAutoconfiguration(DoctrineOrmExpressionProviderInterface::class)
             ->addTag('instacar.extra_filters.doctrine.orm.expression_provider');
-        $container->registerForAutoconfiguration(ExpressionFilter::class)
-            ->setBindings([
-                '$filterLocator' => new Reference('api_platform.filter_locator'),
-                ExpressionLanguage::class => new Reference('instacar.extra_filters.orm.expression_language'),
-            ]);
     }
 }

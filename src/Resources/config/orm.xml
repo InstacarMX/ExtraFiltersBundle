@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <container xmlns="http://symfony.com/schema/dic/services">
     <services>
-        <prototype namespace="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\" resource="../../Doctrine/Orm/Expression/*" autoconfigure="true" autowire="true"/>
-
-        <service id="instacar.extra_filters.orm.expression_language" class="Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage">
+        <service id="instacar.extra_filters.orm.expression_language" class="Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage" public="false">
             <argument type="tagged_iterator" tag="instacar.extra_filters.doctrine.orm.expression_provider"/>
         </service>
+
+        <!-- Expressions -->
+        <service id="instacar.extra_filters.orm.and_expression" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\AndExpression" public="false">
+            <tag>instacar.extra_filters.doctrine.orm.expression_provider</tag>
+        </service>
+        <service id="instacar.extra_filters.orm.or_expression" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\OrExpression" public="false">
+            <tag>instacar.extra_filters.doctrine.orm.expression_provider</tag>
+        </service>
+        <service id="instacar.extra_filters.orm.not_expression" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\NotExpression" public="false">
+            <tag>instacar.extra_filters.doctrine.orm.expression_provider</tag>
+        </service>
+
+        <!-- Filters -->
+        <service id="instacar.extra_filters.orm.expression_filter" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine"/>
+            <argument type="service" id="instacar.extra_filters.orm.expression_language"/>
+            <argument type="service" id="api_platform.filter_locator"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory"/>
+            <argument>null</argument>
+            <argument type="service" id="logger" on-invalid="ignore"/>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter" alias="instacar.extra_filters.orm.expression_filter"/>
     </services>
 </container>

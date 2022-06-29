@@ -5,7 +5,7 @@ namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-class AndExpression extends AbstractDoctrineOrmExpression
+class AndExpression extends AbstractDoctrineOrmExpressionProvider
 {
     protected static string $name = 'andWhere';
 

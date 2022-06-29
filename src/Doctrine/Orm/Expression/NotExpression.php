@@ -5,7 +5,7 @@ namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-class NotExpression extends AbstractDoctrineOrmExpression
+class NotExpression extends AbstractDoctrineOrmExpressionProvider
 {
     protected static string $name = 'notWhere';
 
