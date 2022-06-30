@@ -32,10 +32,11 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
                 static function () {
                     // Uncompilable
                 },
-                static function ($arguments, string $property = null, $value = null) use ($filter) {
+                static function ($arguments, string $property = null, string $strategy = null, $value = null) use ($filter) {
                     return self::applyFilter(
                         $filter,
                         $property ?? $arguments['property'],
+                        $strategy,
                         $value ?? $arguments['value'],
                         $arguments['queryBuilder'],
                         $arguments['queryNameGenerator'],
@@ -62,6 +63,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
     private static function applyFilter(
         ContextAwareFilterInterface $filter,
         string $property,
+        ?string $strategy,
         $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
@@ -72,6 +74,18 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
         // Save and reset the where clause to obtain a untainted expression from the filter
         $originalWhere = $queryBuilder->getDQLPart('where');
         $queryBuilder->resetDQLPart('where');
+
+        try {
+            // Trespass the property protection for $properties with reflection for PHP < 8.1
+            $reflectionClass = new \ReflectionClass($filter);
+            $reflectedProperty = $reflectionClass->getProperty('properties');
+
+            $reflectedProperty->setAccessible(true);
+            $reflectedProperty->setValue($filter, [$property => $strategy]);
+            $reflectedProperty->setAccessible(false);
+        } catch (\ReflectionException $e) {
+            // The property $properties does not exist, ignored it (maybe a custom filter)
+        }
 
         // Bootstrap the context
         $context['filters'] = [$property => $value];

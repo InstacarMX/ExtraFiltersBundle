@@ -25,14 +25,13 @@ class ExpressionFilterPass implements CompilerPassInterface
                 continue;
             }
 
-            $filterDefinitions = $serviceDefinition->getArgument('$filters');
-            if (empty($filterDefinitions)) {
+            $allowedFilters = $serviceDefinition->getArgument('$filters');
+            if (empty($allowedFilters)) {
                 throw new \InvalidArgumentException('You must provide filters for the ExpressionFilter');
             }
 
             $filters = [];
-            foreach ($filterDefinitions as $filterClass => $properties) {
-                $arguments['properties'] = $properties;
+            foreach ($allowedFilters as $filterClass) {
                 $id = $serviceId . '_' . Inflector::tableize(str_replace('\\', '', $filterClass));
 
                 if ($container->has($id)) {
@@ -51,21 +50,6 @@ class ExpressionFilterPass implements CompilerPassInterface
                 }
 
                 $definition->setAutowired(true);
-
-                $parameterNames = [];
-                if (null !== $constructorReflectionMethod = $filterReflectionClass->getConstructor()) {
-                    foreach ($constructorReflectionMethod->getParameters() as $reflectionParameter) {
-                        $parameterNames[$reflectionParameter->name] = true;
-                    }
-                }
-
-                foreach ($arguments as $key => $value) {
-                    if (!isset($parameterNames[$key])) {
-                        throw new InvalidArgumentException(sprintf('Class "%s" does not have argument "$%s".', $filterClass, $key));
-                    }
-
-                    $definition->setArgument("$$key", $value);
-                }
 
                 $filters[] = new Reference($id);
                 $container->setDefinition($id, $definition);

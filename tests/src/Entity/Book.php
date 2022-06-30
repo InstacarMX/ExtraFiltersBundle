@@ -4,8 +4,6 @@ namespace Instacar\ExtraFiltersBundle\Test\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,20 +15,11 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  *     itemOperations={"get"},
  * )
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
- *     "search"="orWhere(search('name'), search('author.name'))",
- *     "exclude"="notWhere(orWhere(search('name'), search('author.name')))",
- *     "available"="andWhere(date('availableStart', {before: value}), date('availableEnd', {after: value}))",
+ *     "search"="orWhere(search('name', 'partial'), search('author.name', 'partial'))",
+ *     "exclude"="notWhere(orWhere(search('name', 'partial'), search('author.name', 'partial')))",
+ *     "available"="andWhere(date('availableStart', 'exclude_null', {before: value}),date('availableEnd', 'exclude_null', {after: value}))",
  * }, arguments={
- *     "filters"={
- *         DateFilter::class={
- *             "availableStart"=DateFilterInterface::EXCLUDE_NULL,
- *             "availableEnd"=DateFilterInterface::EXCLUDE_NULL,
- *         },
- *         SearchFilter::class={
- *             "name"=SearchFilterInterface::STRATEGY_PARTIAL,
- *             "author.name"=SearchFilterInterface::STRATEGY_PARTIAL,
- *         },
- *     },
+ *     "filters"={DateFilter::class, SearchFilter::class},
  * })
  * @ORM\Entity()
  */

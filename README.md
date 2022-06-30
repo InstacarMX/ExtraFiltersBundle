@@ -51,7 +51,7 @@ return [
 
 ## Usage
 You can implement the ExpressionFilter as a normal filter for API Platform, but you must pass in the arguments the
-filters that the expression language have access to, with his properties and his strategies. For example:
+filters that the expression language have access to. For example:
 
 ```php
 // src/Entity/Book.php
@@ -67,12 +67,8 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
     'search' => 'orWhere(search("name"), search("author.name"), search("year"))',
     'arguments' => [
         'filters' => [
-            SearchFilter::class => [
-              'name' => 'ipartial', 
-              'author.name' => 'ipartial', 
-              'year' => 'exact',
-            ],
-        ]   
+            SearchFilter::class,
+        ]
     ]
 ])]
 #[ORM\Entity]
@@ -83,7 +79,7 @@ class Book {
 
 The expression syntax are the following:
 ```php
-['filter-property' => 'operator(filter1(property, value), filter2(property, value), ..., filterN(property, value))'];
+['filter-property' => 'operator(filter1(property, strategy, value), filter2(property, strategy, value), ..., filterN(property, strategy, value))'];
 ```
 
 Where:
@@ -93,6 +89,8 @@ Where:
 - **filter:** A [supported filter](#supported-filters).
 - **property:** The name of the property from the entity. You can use "property" if you want to use the same name from
   the filter-property.
+- **strategy:** The strategy from the documented values in the filter's documentation. Optional. You can use "null" for
+  use the follow parameter.
 - **value:** The value passed to the filter. Optional. You can manipulate the value before pass it to the filter with 
   this property, for example with the DateFilter you can search old dates with `{before: value}`.
 
