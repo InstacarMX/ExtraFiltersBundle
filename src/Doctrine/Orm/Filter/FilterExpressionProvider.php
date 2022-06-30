@@ -5,7 +5,7 @@ namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
+use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionProviderInterface;
 use Instacar\ExtraFiltersBundle\Util\StringUtil;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
@@ -14,7 +14,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
     /**
      * @var ContextAwareFilterInterface[]
      */
-    private array $filters;
+    protected array $filters;
 
     /**
      * @param ContextAwareFilterInterface[] $filters
@@ -52,6 +52,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
     /**
      * @param ContextAwareFilterInterface $filter
      * @param string $property
+     * @param string|null $strategy
      * @param mixed $value
      * @param QueryBuilder $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
@@ -60,7 +61,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
      * @param mixed[] $context
      * @return mixed
      */
-    private static function applyFilter(
+    protected static function applyFilter(
         ContextAwareFilterInterface $filter,
         string $property,
         ?string $strategy,
@@ -98,7 +99,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
         return $expression;
     }
 
-    private static function normalizeFilterName(string $className): string
+    protected static function normalizeFilterName(string $className): string
     {
         $classNamespace = explode('\\', $className);
         $shortName = $classNamespace[count($classNamespace) - 1];

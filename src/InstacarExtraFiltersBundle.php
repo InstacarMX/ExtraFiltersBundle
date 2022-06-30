@@ -6,7 +6,7 @@ use Instacar\ExtraFiltersBundle\DependencyInjection\Compiler\ExpressionFilterPas
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class InstacarExtraFiltersBundle extends Bundle
+final class InstacarExtraFiltersBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
     {

@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ExpressionFilterPass implements CompilerPassInterface
+final class ExpressionFilterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

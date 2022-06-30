@@ -4,10 +4,10 @@ namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
-abstract class AbstractDoctrineOrmExpressionProvider implements DoctrineOrmExpressionProviderInterface
+abstract class AbstractDoctrineOrmExpressionProvider implements ExpressionFunctionProviderInterface
 {
     protected static string $name;
 

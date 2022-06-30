@@ -2,13 +2,13 @@
 
 namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
+use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class InstacarExtraFiltersExtension extends Extension
+final class InstacarExtraFiltersExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {

@@ -13,7 +13,7 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-class ExpressionFilter extends AbstractContextAwareFilter
+final class ExpressionFilter extends AbstractContextAwareFilter
 {
     private ExpressionLanguage $expressionLanguage;
 

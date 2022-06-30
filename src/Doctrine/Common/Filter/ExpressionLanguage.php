@@ -6,7 +6,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 
-class ExpressionLanguage extends BaseExpressionLanguage
+final class ExpressionLanguage extends BaseExpressionLanguage
 {
     /**
      * @param iterable<ExpressionFunctionProviderInterface> $providers
