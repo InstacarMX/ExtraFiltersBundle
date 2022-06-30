@@ -16,18 +16,21 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  *     collectionOperations={"get"},
  *     itemOperations={"get"},
  * )
- * @ApiFilter(filterClass=DateFilter::class, properties={
- *     "availableStart"=DateFilterInterface::EXCLUDE_NULL,
- *     "availableEnd"=DateFilterInterface::EXCLUDE_NULL,
- * })
- * @ApiFilter(filterClass=SearchFilter::class, properties={
- *     "name"=SearchFilterInterface::STRATEGY_PARTIAL,
- *     "author.name"=SearchFilterInterface::STRATEGY_PARTIAL,
- * })
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
  *     "search"="orWhere(search('name'), search('author.name'))",
  *     "exclude"="notWhere(orWhere(search('name'), search('author.name')))",
  *     "available"="andWhere(date('availableStart', {before: value}), date('availableEnd', {after: value}))",
+ * }, arguments={
+ *     "filters"={
+ *         DateFilter::class={
+ *             "availableStart"=DateFilterInterface::EXCLUDE_NULL,
+ *             "availableEnd"=DateFilterInterface::EXCLUDE_NULL,
+ *         },
+ *         SearchFilter::class={
+ *             "name"=SearchFilterInterface::STRATEGY_PARTIAL,
+ *             "author.name"=SearchFilterInterface::STRATEGY_PARTIAL,
+ *         },
+ *     },
  * })
  * @ORM\Entity()
  */

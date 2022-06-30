@@ -20,7 +20,7 @@ abstract class AbstractDoctrineOrmExpressionProvider implements DoctrineOrmExpre
                     // Uncompilable
                 },
                 function ($arguments, ...$expressions) {
-                    return $this->process(
+                    return $this->apply(
                         $expressions,
                         $arguments['queryBuilder'],
                         $arguments['resourceClass'],
@@ -38,5 +38,5 @@ abstract class AbstractDoctrineOrmExpressionProvider implements DoctrineOrmExpre
      * @param string|null $operationName
      * @return mixed
      */
-    abstract public function process(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName);
+    abstract public function apply(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName);
 }

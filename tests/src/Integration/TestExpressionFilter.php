@@ -33,66 +33,6 @@ class TestExpressionFilter extends ApiTestCase
                     'get' => [
                         'parameters' => [
                             [
-                                'name' => 'availableStart[before]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableStart[strictly_before]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableStart[after]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableStart[strictly_after]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableEnd[before]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableEnd[strictly_before]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableEnd[after]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'availableEnd[strictly_after]',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'name',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'author.name',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
                                 'name' => 'search',
                                 'in' => 'query',
                                 'required' => false,
@@ -266,6 +206,44 @@ class TestExpressionFilter extends ApiTestCase
                 'name' => 'How to test',
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+        ]);
+    }
+
+    public function testDirectFilters(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?author.name=john&availableStart[before]=2022-01-15&availableEnd[after]=2022-01-15', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Symfony 6: The right way',
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
         ]);

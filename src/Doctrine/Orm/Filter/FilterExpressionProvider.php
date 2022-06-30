@@ -9,25 +9,32 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterf
 use Instacar\ExtraFiltersBundle\Util\StringUtil;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
-class ExpressionProviderFilterAdapter implements DoctrineOrmExpressionProviderInterface
+class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
 {
-    private ContextAwareFilterInterface $filter;
+    /**
+     * @var ContextAwareFilterInterface[]
+     */
+    private array $filters;
 
-    public function __construct(ContextAwareFilterInterface $filter)
+    /**
+     * @param ContextAwareFilterInterface[] $filters
+     */
+    public function __construct(array $filters)
     {
-        $this->filter = $filter;
+        $this->filters = $filters;
     }
 
     public function getFunctions(): array
     {
-        return [
-            new ExpressionFunction(
-                self::normalizeFilterName(get_class($this->filter)),
+        return array_map(static function ($filter) {
+            return new ExpressionFunction(
+                self::normalizeFilterName(get_class($filter)),
                 static function () {
                     // Uncompilable
                 },
-                function ($arguments, string $property = null, $value = null) {
-                    return $this->process(
+                static function ($arguments, string $property = null, $value = null) use ($filter) {
+                    return self::applyFilter(
+                        $filter,
                         $property ?? $arguments['property'],
                         $value ?? $arguments['value'],
                         $arguments['queryBuilder'],
@@ -37,11 +44,12 @@ class ExpressionProviderFilterAdapter implements DoctrineOrmExpressionProviderIn
                         $arguments['context'],
                     );
                 },
-            ),
-        ];
+            );
+        }, $this->filters);
     }
 
     /**
+     * @param ContextAwareFilterInterface $filter
      * @param string $property
      * @param mixed $value
      * @param QueryBuilder $queryBuilder
@@ -51,7 +59,8 @@ class ExpressionProviderFilterAdapter implements DoctrineOrmExpressionProviderIn
      * @param mixed[] $context
      * @return mixed
      */
-    private function process(
+    private static function applyFilter(
+        ContextAwareFilterInterface $filter,
         string $property,
         $value,
         QueryBuilder $queryBuilder,
@@ -66,7 +75,7 @@ class ExpressionProviderFilterAdapter implements DoctrineOrmExpressionProviderIn
 
         // Bootstrap the context
         $context['filters'] = [$property => $value];
-        $this->filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 
         // Save the generated expression from the filter and restore the where clause
         $expression = $queryBuilder->getDQLPart('where');

@@ -9,7 +9,7 @@ class AndExpression extends AbstractDoctrineOrmExpressionProvider
 {
     protected static string $name = 'andWhere';
 
-    public function process(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Andx
+    public function apply(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Andx
     {
         return new Expr\Andx($expressions);
     }

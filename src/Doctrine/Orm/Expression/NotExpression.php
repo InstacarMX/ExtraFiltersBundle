@@ -9,7 +9,7 @@ class NotExpression extends AbstractDoctrineOrmExpressionProvider
 {
     protected static string $name = 'notWhere';
 
-    public function process(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Func
+    public function apply(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Func
     {
         return new Expr\Func('NOT', $expressions);
     }

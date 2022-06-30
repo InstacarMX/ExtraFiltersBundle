@@ -9,7 +9,7 @@ class OrExpression extends AbstractDoctrineOrmExpressionProvider
 {
     protected static string $name = 'orWhere';
 
-    public function process(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Orx
+    public function apply(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName): Expr\Orx
     {
         return new Expr\Orx($expressions);
     }
