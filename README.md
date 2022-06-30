@@ -22,7 +22,7 @@ of the Composer documentation.
 Open a command console, enter your project directory and execute:
 
 ```shell
-composer require instacar/composable-filter-bundle:dev-main
+composer require instacar/composable-filter-bundle:dev-filter-adapter
 ```
 
 That's all! You can jump right to "Configuration".
@@ -33,7 +33,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```shell
-composer require instacar/extra-filters-bundle:dev-main
+composer require instacar/extra-filters-bundle:dev-filter-adapter
 ```
 
 #### Step 2: Enable the Bundle
@@ -50,20 +50,30 @@ return [
 ```
 
 ## Usage
-You can implement the filter just as any filter in API Platform (keep in mind that this filter is for advanced 
-use-cases, if you can implement a normal filter from API Platform, use it).
+You can implement the ExpressionFilter as a normal filter for API Platform, but you must pass in the arguments the
+filters that the expression language have access to, with his properties and his strategies. For example:
 
 ```php
 // src/Entity/Book.php
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
 #[ApiResource]
 #[ApiFilter(ExpressionFilter::class, properties: [
-    'search' => 'orWhere(match("name", "ipartial"), match("author.name", "ipartial"), match("year", "exact"))',
+    'search' => 'orWhere(search("name"), search("author.name"), search("year"))',
+    'arguments' => [
+        'filters' => [
+            SearchFilter::class => [
+              'name' => 'ipartial', 
+              'author.name' => 'ipartial', 
+              'year' => 'exact',
+            ],
+        ]   
+    ]
 ])]
 #[ORM\Entity]
 class Book {
@@ -73,7 +83,7 @@ class Book {
 
 The expression syntax are the following:
 ```php
-['filter-property' => 'operator(filter1(property, strategy, arguments), filter2(property, strategy, arguments), ..., filterN(property, strategy, arguments))'];
+['filter-property' => 'operator(filter1(property, value), filter2(property, value), ..., filterN(property, value))'];
 ```
 
 Where:
@@ -83,10 +93,8 @@ Where:
 - **filter:** A [supported filter](#supported-filters).
 - **property:** The name of the property from the entity. You can use "property" if you want to use the same name from
   the filter-property.
-- **strategy:** The strategy from the documented values in the filter's documentation. Optional. You can use "null" for
-  use the follow parameter.
-- **arguments:** The arguments in form of "[array]" or "{key: value}". Same as the "arguments" property from API 
-  Platform filter attribute. Optional.
+- **value:** The value passed to the filter. Optional. You can manipulate the value before pass it to the filter with 
+  this property, for example with the DateFilter you can search old dates with `{before: value}`.
 
 ### Supported operators
 - **andWhere:** Equal to the SQL operator "AND".
@@ -94,15 +102,19 @@ Where:
 - **notWhere:** Equal to the SQL operator "NOT".
 
 ### Supported filters
-- **match:** Equal to the filter "SearchFilter".
+- All the filters for API Platform for the ORM (currently tested SearchFilter and DateFilter).
+- Custom filters that implement the interface `ContextAwareFilterInterface` for the ORM.
+Note: The filter's name for the expression is in camelCase without the "Filter" suffix (for example, SearchFilter is
+converted to search).
 
 ## Limitations
-- It only has the "match" filter (a copy of the SearchFilter for API Platform).
+- It only works with the ORM filters.
 - It does not generate a tailored documentation for API Platform, it only generates a generic property with the "string" value.
 
 ## Future work
 These are the list of the ideas that I have for this bundle. If you have another idea, let me know in the "Issues" tab.
-- Implement all the API Platform and the user's filters throughout a decorated Query Builder (without rewrite it).
+- Working ODM filters with this filter.
+- A simplified filter usage with auto-register.
 
 ## Licensing
 This bundle is licensed under the GNU LGPLv3. For a quick resume of the permissions with this license see the
