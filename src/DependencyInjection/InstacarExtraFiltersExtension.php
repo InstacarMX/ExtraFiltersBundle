@@ -2,7 +2,6 @@
 
 namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\DoctrineOrmExpressionProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,9 +12,10 @@ class InstacarExtraFiltersExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
     }
@@ -34,6 +34,8 @@ class InstacarExtraFiltersExtension extends Extension
         }
 
         $loader->load('orm.xml');
+
+        $container->setParameter('instacar.extra_filters.doctrine.orm.filters', array_keys(array_filter($config['doctrine']['filters'])));
 
         $container->registerForAutoconfiguration(DoctrineOrmExpressionProviderInterface::class)
             ->addTag('instacar.extra_filters.doctrine.orm.expression_provider');

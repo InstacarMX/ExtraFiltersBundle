@@ -49,8 +49,34 @@ return [
 ];
 ```
 
+## Configuration
+By default, the ExpressionFilter enable the API Platform filters by default (excluding OrderFilter), but you can enable 
+your own filters using updating the configuration. Example:
+```yaml
+# config/packages/instacar_extra_filters.yml
+instacar_extra_filters:
+  doctrine:
+    filters:
+      App\Filter\CustomFilter: true
+```
+
+You can also disable the API Platforms filters for the ExpressionFilter setting the value of the filter to "false". 
+Example with all the available filters:
+```yaml
+# config/packages/instacar_extra_filters.yml
+instacar_extra_filters:
+  doctrine:
+    filters:
+      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter: false
+      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter: false
+      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter: false
+      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter: false
+      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter: false
+      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter: false
+```
+
 ## Usage
-You can implement the ExpressionFilter as a normal filter for API Platform, but you must pass in the arguments the
+You can implement the ExpressionFilter as a normal filter for API Platform. You can pass in the arguments the
 filters that the expression language have access to. For example:
 
 ```php
@@ -64,12 +90,9 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
 #[ApiResource]
 #[ApiFilter(ExpressionFilter::class, properties: [
-    'search' => 'orWhere(search("name"), search("author.name"), search("year"))',
-    'arguments' => [
-        'filters' => [
-            SearchFilter::class,
-        ]
-    ]
+    'search' => 'orWhere(search("name", "partial"), search("author.name", "partial"), search("year", "partial"))',
+], arguments: [
+    'filters' => [SearchFilter::class] // Only allow the ExpressionFilter to use the SearchFilter
 ])]
 #[ORM\Entity]
 class Book {
@@ -112,7 +135,6 @@ converted to search).
 ## Future work
 These are the list of the ideas that I have for this bundle. If you have another idea, let me know in the "Issues" tab.
 - Working ODM filters with this filter.
-- A simplified filter usage with auto-register.
 
 ## Licensing
 This bundle is licensed under the GNU LGPLv3. For a quick resume of the permissions with this license see the

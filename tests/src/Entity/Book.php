@@ -4,8 +4,6 @@ namespace Instacar\ExtraFiltersBundle\Test\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
@@ -18,8 +16,6 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  *     "search"="orWhere(search('name', 'partial'), search('author.name', 'partial'))",
  *     "exclude"="notWhere(orWhere(search('name', 'partial'), search('author.name', 'partial')))",
  *     "available"="andWhere(date('availableStart', 'exclude_null', {before: value}),date('availableEnd', 'exclude_null', {after: value}))",
- * }, arguments={
- *     "filters"={DateFilter::class, SearchFilter::class},
  * })
  * @ORM\Entity()
  */

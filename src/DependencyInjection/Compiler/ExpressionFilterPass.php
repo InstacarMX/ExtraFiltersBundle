@@ -15,6 +15,10 @@ class ExpressionFilterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        $availableFilters = [
+            OrmExpressionFilter::class => $container->getParameter('instacar.extra_filters.doctrine.orm.filters'),
+        ];
+
         foreach ($container->findTaggedServiceIds('api_platform.filter', true) as $serviceId => $tags) {
             $serviceDefinition = $container->getDefinition($serviceId);
             $serviceClass = $serviceDefinition instanceof ChildDefinition
@@ -25,7 +29,12 @@ class ExpressionFilterPass implements CompilerPassInterface
                 continue;
             }
 
-            $allowedFilters = $serviceDefinition->getArgument('$filters');
+            try {
+                $allowedFilters = $serviceDefinition->getArgument('$filters');
+            } catch (\OutOfBoundsException $e) {
+                $allowedFilters = $availableFilters[$serviceClass];
+            }
+
             if (empty($allowedFilters)) {
                 throw new \InvalidArgumentException('You must provide filters for the ExpressionFilter');
             }
