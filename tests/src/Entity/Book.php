@@ -13,8 +13,9 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  *     itemOperations={"get"},
  * )
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
- *     "search"="orWhere(match('name', 'ipartial'), match('author.name', 'ipartial'), match('year', 'exact'))",
- *     "exclude"="notWhere(orWhere(match('name', 'ipartial'), match('author.name', 'ipartial')))"
+ *     "search"="orWhere(search('name', 'partial'), search('author.name', 'partial'))",
+ *     "exclude"="notWhere(orWhere(search('name', 'partial'), search('author.name', 'partial')))",
+ *     "available"="andWhere(date('availableStart', 'exclude_null', {before: value}),date('availableEnd', 'exclude_null', {after: value}))",
  * })
  * @ORM\Entity()
  */
@@ -33,9 +34,14 @@ class Book
     private string $name;
 
     /**
-     * @ORM\Column(type="string", length=4)
+     * @ORM\Column(type="date")
      */
-    private string $year;
+    private \DateTimeInterface $availableStart;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private \DateTimeInterface $availableEnd;
 
     /**
      * @ORM\ManyToOne()
@@ -43,10 +49,11 @@ class Book
      */
     private Author $author;
 
-    public function __construct(string $name, string $year, Author $author)
+    public function __construct(string $name, \DateTimeInterface $availableDateStart, \DateTimeInterface $availableDateEnd, Author $author)
     {
         $this->name = $name;
-        $this->year = $year;
+        $this->availableStart = $availableDateStart;
+        $this->availableEnd = $availableDateEnd;
         $this->author = $author;
     }
 
@@ -65,14 +72,24 @@ class Book
         $this->name = $name;
     }
 
-    public function getYear(): string
+    public function getAvailableStart(): \DateTimeInterface
     {
-        return $this->year;
+        return $this->availableStart;
     }
 
-    public function setYear(string $year): void
+    public function setAvailableStart(\DateTimeInterface $availableStart): void
     {
-        $this->year = $year;
+        $this->availableStart = $availableStart;
+    }
+
+    public function getAvailableEnd(): \DateTimeInterface
+    {
+        return $this->availableEnd;
+    }
+
+    public function setAvailableEnd(\DateTimeInterface $availableEnd): void
+    {
+        $this->availableEnd = $availableEnd;
     }
 
     public function getAuthor(): Author

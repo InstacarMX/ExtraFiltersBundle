@@ -2,23 +2,20 @@
 
 namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
-use Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionInterface;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\Generator\DoctrineOrmGeneratorInterface;
+use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class InstacarExtraFiltersExtension extends Extension
+final class InstacarExtraFiltersExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
     }
@@ -38,13 +35,9 @@ class InstacarExtraFiltersExtension extends Extension
 
         $loader->load('orm.xml');
 
-        $container->registerForAutoconfiguration(DoctrineOrmGeneratorInterface::class)
+        $container->setParameter('instacar.extra_filters.doctrine.orm.filters', array_keys(array_filter($config['doctrine']['filters'])));
+
+        $container->registerForAutoconfiguration(DoctrineOrmExpressionProviderInterface::class)
             ->addTag('instacar.extra_filters.doctrine.orm.expression_provider');
-        $container->registerForAutoconfiguration(DoctrineOrmExpressionInterface::class)
-            ->addTag('instacar.extra_filters.doctrine.orm.expression_provider');
-        $container->registerForAutoconfiguration(ExpressionFilter::class)
-            ->setBindings([
-                ExpressionLanguage::class => $container->getDefinition('instacar.extra_filters.orm.expression_language'),
-            ]);
     }
 }

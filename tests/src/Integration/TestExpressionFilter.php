@@ -18,6 +18,51 @@ class TestExpressionFilter extends ApiTestCase
         $this->databaseTool = $databaseTool->get();
     }
 
+    public function testDocumentation(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/docs', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonContains([
+            'paths' => [
+                '/books' => [
+                    'get' => [
+                        'parameters' => [
+                            [
+                                'name' => 'search',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'exclude',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'available',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'description' => 'The collection page number',
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ]
+                ]
+            ]
+        ]);
+    }
 
     public function testSearchExpressionFilter(): void
     {
@@ -36,7 +81,8 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
-                'year' => '2021',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
             ],
         ]);
@@ -50,13 +96,15 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
-                'year' => '2022',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
-                'year' => '2022',
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
         ]);
@@ -79,13 +127,15 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
-                'year' => '2022',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
-                'year' => '2022',
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
             ],
         ]);
@@ -99,8 +149,102 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
-                'year' => '2021',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+            ],
+        ]);
+    }
+
+    public function testAvailableExpressionFilters(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?available=2022-01-15', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+        ]);
+    }
+
+    public function testCombinedFilters(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?search=jane&exclude=symfony', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+        ]);
+    }
+
+    public function testDirectFilters(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?author.name=john&availableStart[before]=2022-01-15&availableEnd[after]=2022-01-15', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Symfony 6: The right way',
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
+                'author' => '/authors/2',
             ],
         ]);
     }

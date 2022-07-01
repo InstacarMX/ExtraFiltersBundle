@@ -3,6 +3,7 @@
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,9 +13,9 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-class ExpressionFilter extends AbstractContextAwareFilter
+final class ExpressionFilter extends AbstractContextAwareFilter
 {
-    private ExpressionLanguage $ormExpressionLanguage;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -22,6 +23,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
      * @param RequestStack|null $requestStack
      * @param LoggerInterface|null $logger
      * @param array<string, string>|null $properties
+     * @param ContextAwareFilterInterface[] $filters
      * @param NameConverterInterface|null $nameConverter
      */
     public function __construct(
@@ -30,11 +32,13 @@ class ExpressionFilter extends AbstractContextAwareFilter
         ?RequestStack $requestStack = null,
         LoggerInterface $logger = null,
         array $properties = null,
+        array $filters = null,
         NameConverterInterface $nameConverter = null
     ) {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
-        $this->ormExpressionLanguage = $expressionLanguage;
+        $this->expressionLanguage = $expressionLanguage;
+        $this->expressionLanguage->registerProvider(new FilterExpressionProvider($filters));
     }
 
     /**
@@ -45,7 +49,7 @@ class ExpressionFilter extends AbstractContextAwareFilter
     {
         $description = [];
 
-        foreach ($this->properties as $property) {
+        foreach ($this->properties as $property => $unused) {
             $description[$property] = [
                 'property' => null,
                 'required' => false,
@@ -63,15 +67,17 @@ class ExpressionFilter extends AbstractContextAwareFilter
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         string $operationName = null
+        /*array $context = []*/
     ): void {
+        $context = func_get_arg(6);
         if (($expression = $this->properties[$property] ?? null) === null) {
             return;
         }
 
         try {
-            $this->ormExpressionLanguage->lint(
+            $this->expressionLanguage->lint(
                 $expression,
-                ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operationName'],
+                ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operationName', 'context'],
             );
         } catch (SyntaxError $e) {
             $this->logger->notice('Invalid filter ignored', ['exception' => $e]);
@@ -79,13 +85,14 @@ class ExpressionFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $queryExpression = $this->ormExpressionLanguage->evaluate($expression, [
+        $queryExpression = $this->expressionLanguage->evaluate($expression, [
             'property' => $property,
             'value' => $value,
             'queryBuilder' => $queryBuilder,
             'queryNameGenerator' => $queryNameGenerator,
             'resourceClass' => $resourceClass,
             'operationName' => $operationName,
+            'context' => $context,
         ]);
         $queryBuilder->andWhere($queryExpression);
     }
