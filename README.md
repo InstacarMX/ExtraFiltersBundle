@@ -22,7 +22,7 @@ of the Composer documentation.
 Open a command console, enter your project directory and execute:
 
 ```shell
-composer require instacar/composable-filter-bundle:dev-filter-adapter
+composer require instacar/extra-filters-bundle
 ```
 
 That's all! You can jump right to "Configuration".
@@ -33,7 +33,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```shell
-composer require instacar/extra-filters-bundle:dev-filter-adapter
+composer require instacar/extra-filters-bundle
 ```
 
 #### Step 2: Enable the Bundle
