@@ -12,7 +12,7 @@ composer.lock
 ###< symfony/phpunit-bridge ###
 
 ###> symfony/framework-bundle ###
-/tests/var/
+/app/var/
 /vendor/
 ###< symfony/framework-bundle ###
 

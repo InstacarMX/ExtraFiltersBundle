@@ -1,6 +1,6 @@
 <?php
 
-namespace Instacar\ExtraFiltersBundle\Test\Entity;
+namespace Instacar\ExtraFiltersBundle\App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;

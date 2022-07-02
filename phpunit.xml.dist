@@ -12,7 +12,7 @@
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
 
-        <server name="KERNEL_CLASS" value="\Instacar\ExtraFiltersBundle\Test\Kernel"/>
+        <server name="KERNEL_CLASS" value="Instacar\ExtraFiltersBundle\App\Kernel"/>
         <server name="TRUSTED_HOSTS" value="^example\.com|localhost$"/>
 
         <!-- ###+ symfony/framework-bundle ### -->
@@ -33,7 +33,7 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>tests</directory>
+            <directory suffix=".php">tests</directory>
         </testsuite>
     </testsuites>
 

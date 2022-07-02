@@ -1,6 +1,6 @@
 <?php
 
-namespace Instacar\ExtraFiltersBundle\Test;
+namespace Instacar\ExtraFiltersBundle\App;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -42,7 +42,7 @@ class Kernel extends BaseKernel
                         'Test' => [
                             'type' => 'annotation',
                             'dir' => '%kernel.project_dir%/src/Entity',
-                            'prefix' => 'Instacar\ExtraFiltersBundle\Test\Entity',
+                            'prefix' => 'Instacar\ExtraFiltersBundle\App\Entity',
                         ],
                     ],
                 ],

@@ -1,9 +1,9 @@
 <?php
 
-namespace Instacar\ExtraFiltersBundle\Test\Integration;
+namespace Instacar\ExtraFiltersBundle\Test\Application;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-use Instacar\ExtraFiltersBundle\Test\DataFixtures\BookFixture;
+use Instacar\ExtraFiltersBundle\App\DataFixtures\BookFixture;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 

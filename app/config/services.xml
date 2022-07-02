@@ -5,6 +5,11 @@
     <services>
         <defaults autowire="true" autoconfigure="true"/>
 
-        <prototype namespace="Instacar\ExtraFiltersBundle\Test\" resource="../src/{DataFixtures}"/>
+        <prototype namespace="Instacar\ExtraFiltersBundle\App\" resource="../src/">
+            <exclude>../src/DependencyInjection/</exclude>
+            <exclude>../src/Entity/</exclude>
+            <exclude>../src/Kernel.php</exclude>
+            <exclude>../src/Tests/</exclude>
+        </prototype>
     </services>
 </container>

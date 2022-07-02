@@ -1,11 +1,11 @@
 <?php
 
-namespace Instacar\ExtraFiltersBundle\Test\DataFixtures;
+namespace Instacar\ExtraFiltersBundle\App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Instacar\ExtraFiltersBundle\Test\Entity\Author;
-use Instacar\ExtraFiltersBundle\Test\Entity\Book;
+use Instacar\ExtraFiltersBundle\App\Entity\Author;
+use Instacar\ExtraFiltersBundle\App\Entity\Book;
 
 class BookFixture extends Fixture
 {
