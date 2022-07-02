@@ -45,6 +45,12 @@ class TestExpressionFilter extends ApiTestCase
                                 'type' => 'string',
                             ],
                             [
+                                'name' => 'budget',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
                                 'name' => 'available',
                                 'in' => 'query',
                                 'required' => false,
@@ -81,6 +87,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
+                'price' => 120,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
@@ -96,6 +103,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
+                'price' => 180,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -103,6 +111,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
+                'price' => 250,
                 'availableStart' => '2022-02-01T00:00:00+00:00',
                 'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -127,6 +136,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
+                'price' => 180,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -134,6 +144,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
+                'price' => 250,
                 'availableStart' => '2022-02-01T00:00:00+00:00',
                 'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -149,6 +160,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
+                'price' => 120,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
@@ -156,7 +168,40 @@ class TestExpressionFilter extends ApiTestCase
         ]);
     }
 
-    public function testAvailableExpressionFilters(): void
+    public function testBudgetExpressionFilter(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?budget=150', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'price' => 120,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'price' => 180,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+            ],
+        ]);
+    }
+
+    public function testAvailableExpressionFilter(): void
     {
         $this->databaseTool->loadFixtures([
             BookFixture::class,
@@ -173,6 +218,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
+                'price' => 120,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
@@ -180,6 +226,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
+                'price' => 180,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -204,6 +251,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
+                'price' => 180,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -228,6 +276,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 1,
                 'name' => 'PHP for dummies',
+                'price' => 120,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
@@ -235,6 +284,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 2,
                 'name' => 'How to test',
+                'price' => 180,
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
@@ -242,6 +292,7 @@ class TestExpressionFilter extends ApiTestCase
             [
                 'id' => 3,
                 'name' => 'Symfony 6: The right way',
+                'price' => 250,
                 'availableStart' => '2022-02-01T00:00:00+00:00',
                 'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',

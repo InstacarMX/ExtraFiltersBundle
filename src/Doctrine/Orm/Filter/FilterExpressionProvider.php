@@ -89,7 +89,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
         }
 
         // Bootstrap the context
-        $context['filters'] = [$property => $value];
+        $context['filters'] = [$property => self::normalizeValue($value)];
         $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 
         // Save the generated expression from the filter and restore the where clause
@@ -97,6 +97,25 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
         $queryBuilder->where($originalWhere);
 
         return $expression;
+    }
+
+    /**
+     * Function to cast all the values to string, in the case that the expression operates with it.
+     * @param mixed $value
+     * @return string|mixed[]
+     */
+    protected static function normalizeValue($value)
+    {
+        if (!is_array($value)) {
+            return (string) $value;
+        }
+
+        $normalizedArray = [];
+        foreach ($value as $key => $item) {
+            $normalizedArray[$key] = self::normalizeValue($item);
+        }
+
+        return $normalizedArray;
     }
 
     protected static function normalizeFilterName(string $className): string

@@ -15,6 +15,7 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
  * @ApiFilter(filterClass=ExpressionFilter::class, properties={
  *     "search"="orWhere(search('name', 'partial'), search('author.name', 'partial'))",
  *     "exclude"="notWhere(orWhere(search('name', 'partial'), search('author.name', 'partial')))",
+ *     "budget"="range('price', null, {gte: (value - 50), lte: (value + 50)})",
  *     "available"="andWhere(date('availableStart', 'exclude_null', {before: value}),date('availableEnd', 'exclude_null', {after: value}))",
  * })
  * @ORM\Entity()
@@ -34,6 +35,11 @@ class Book
     private string $name;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private int $price;
+
+    /**
      * @ORM\Column(type="date")
      */
     private \DateTimeInterface $availableStart;
@@ -49,9 +55,15 @@ class Book
      */
     private Author $author;
 
-    public function __construct(string $name, \DateTimeInterface $availableDateStart, \DateTimeInterface $availableDateEnd, Author $author)
-    {
+    public function __construct(
+        string $name,
+        int $price,
+        \DateTimeInterface $availableDateStart,
+        \DateTimeInterface $availableDateEnd,
+        Author $author
+    ) {
         $this->name = $name;
+        $this->price = $price;
         $this->availableStart = $availableDateStart;
         $this->availableEnd = $availableDateEnd;
         $this->author = $author;
@@ -70,6 +82,16 @@ class Book
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function getPrice(): int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(int $price): void
+    {
+        $this->price = $price;
     }
 
     public function getAvailableStart(): \DateTimeInterface

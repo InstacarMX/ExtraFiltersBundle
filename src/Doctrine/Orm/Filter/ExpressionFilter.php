@@ -9,7 +9,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -79,21 +78,19 @@ final class ExpressionFilter extends AbstractContextAwareFilter
                 $expression,
                 ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operationName', 'context'],
             );
-        } catch (SyntaxError $e) {
+
+            $queryExpression = $this->expressionLanguage->evaluate($expression, [
+                'property' => $property,
+                'value' => $value,
+                'queryBuilder' => $queryBuilder,
+                'queryNameGenerator' => $queryNameGenerator,
+                'resourceClass' => $resourceClass,
+                'operationName' => $operationName,
+                'context' => $context,
+            ]);
+            $queryBuilder->andWhere($queryExpression);
+        } catch (\Exception $e) {
             $this->logger->notice('Invalid filter ignored', ['exception' => $e]);
-
-            return;
         }
-
-        $queryExpression = $this->expressionLanguage->evaluate($expression, [
-            'property' => $property,
-            'value' => $value,
-            'queryBuilder' => $queryBuilder,
-            'queryNameGenerator' => $queryNameGenerator,
-            'resourceClass' => $resourceClass,
-            'operationName' => $operationName,
-            'context' => $context,
-        ]);
-        $queryBuilder->andWhere($queryExpression);
     }
 }
