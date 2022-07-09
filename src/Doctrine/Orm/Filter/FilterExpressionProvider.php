@@ -4,6 +4,7 @@ namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionProviderInterface;
 use Instacar\ExtraFiltersBundle\Util\StringUtil;
@@ -16,23 +17,35 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
      */
     protected array $filters;
 
+    private bool $innerJoinsLeft;
+
     /**
      * @param ContextAwareFilterInterface[] $filters
      */
-    public function __construct(array $filters)
+    public function __construct(array $filters, bool $innerJoinsLeft = false)
     {
         $this->filters = $filters;
+        $this->innerJoinsLeft = $innerJoinsLeft;
     }
 
     public function getFunctions(): array
     {
-        return array_map(static function ($filter) {
+        $innerJoinsLeft = $this->innerJoinsLeft;
+        return array_map(static function ($filter) use ($innerJoinsLeft) {
             return new ExpressionFunction(
                 self::normalizeFilterName(get_class($filter)),
                 static function () {
                     // Uncompilable
                 },
-                static function ($arguments, string $property = null, string $strategy = null, $value = null) use ($filter) {
+                static function (
+                    $arguments,
+                    string $property = null,
+                    string $strategy = null,
+                    $value = null
+                ) use (
+                    $filter,
+                    $innerJoinsLeft
+                ) {
                     return self::applyFilter(
                         $filter,
                         $property ?? $arguments['property'],
@@ -43,6 +56,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
                         $arguments['resourceClass'],
                         $arguments['operationName'],
                         $arguments['context'],
+                        $innerJoinsLeft,
                     );
                 },
             );
@@ -59,6 +73,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
      * @param string $resourceClass
      * @param string|null $operationName
      * @param mixed[] $context
+     * @param bool $innerJoinsLeft
      * @return mixed
      */
     protected static function applyFilter(
@@ -70,7 +85,8 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?string $operationName,
-        array $context
+        array $context,
+        bool $innerJoinsLeft
     ) {
         // Save and reset the where clause to obtain a untainted expression from the filter
         $originalWhere = $queryBuilder->getDQLPart('where');
@@ -95,6 +111,29 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
         // Save the generated expression from the filter and restore the where clause
         $expression = $queryBuilder->getDQLPart('where');
         $queryBuilder->where($originalWhere);
+
+        if ($innerJoinsLeft) {
+            $joinPart = $queryBuilder->getDQLPart('join');
+            $result = [];
+            foreach ($joinPart as $rootAlias => $joins) {
+                /** @var Join $joinExp */
+                foreach ($joins as $i => $joinExp) {
+                    if ($joinExp->getJoinType() === Join::INNER_JOIN) {
+                        $result[$rootAlias][$i] = new Join(
+                            Join::LEFT_JOIN,
+                            $joinExp->getJoin(),
+                            $joinExp->getAlias(),
+                            $joinExp->getConditionType(),
+                            $joinExp->getCondition(),
+                            $joinExp->getIndexBy()
+                        );
+                    } else {
+                        $result[$rootAlias][$i] = $joinExp;
+                    }
+                }
+            }
+            $queryBuilder->add('join', $result);
+        }
 
         return $expression;
     }

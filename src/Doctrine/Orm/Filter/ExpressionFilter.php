@@ -24,6 +24,7 @@ final class ExpressionFilter extends AbstractContextAwareFilter
      * @param array<string, string>|null $properties
      * @param ContextAwareFilterInterface[] $filters
      * @param NameConverterInterface|null $nameConverter
+     * @param bool $innerJoinsLeft
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -32,12 +33,13 @@ final class ExpressionFilter extends AbstractContextAwareFilter
         LoggerInterface $logger = null,
         array $properties = null,
         array $filters = null,
-        NameConverterInterface $nameConverter = null
+        NameConverterInterface $nameConverter = null,
+        bool $innerJoinsLeft = false
     ) {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
         $this->expressionLanguage = $expressionLanguage;
-        $this->expressionLanguage->registerProvider(new FilterExpressionProvider($filters));
+        $this->expressionLanguage->registerProvider(new FilterExpressionProvider($filters, $innerJoinsLeft));
     }
 
     /**
