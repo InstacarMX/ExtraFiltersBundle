@@ -2,7 +2,7 @@
 
 namespace Instacar\ExtraFiltersBundle\Test\Application;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Instacar\ExtraFiltersBundle\App\DataFixtures\BookFixture;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
@@ -33,35 +33,44 @@ class TestExpressionFilter extends ApiTestCase
                     'get' => [
                         'parameters' => [
                             [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'description' => 'The collection page number',
+                                'schema' => [
+                                    'type' => 'integer',
+                                ],
+                            ],
+                            [
                                 'name' => 'search',
                                 'in' => 'query',
                                 'required' => false,
-                                'type' => 'string',
+                                'schema' => [
+                                    'type' => 'string',
+                                ],
                             ],
                             [
                                 'name' => 'exclude',
                                 'in' => 'query',
                                 'required' => false,
-                                'type' => 'string',
+                                'schema' => [
+                                    'type' => 'string',
+                                ],
                             ],
                             [
                                 'name' => 'budget',
                                 'in' => 'query',
-                                'required' => false,
-                                'type' => 'string',
+                                'schema' => [
+                                    'type' => 'string',
+                                ],
                             ],
                             [
                                 'name' => 'available',
                                 'in' => 'query',
                                 'required' => false,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'page',
-                                'in' => 'query',
-                                'required' => false,
-                                'description' => 'The collection page number',
-                                'type' => 'integer',
+                                'schema' => [
+                                    'type' => 'string',
+                                ],
                             ],
                         ],
                     ]

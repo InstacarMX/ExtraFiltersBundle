@@ -2,7 +2,7 @@
 
 namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter as OrmFilter;
+use ApiPlatform\Doctrine\Orm\Filter as OrmFilter;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;

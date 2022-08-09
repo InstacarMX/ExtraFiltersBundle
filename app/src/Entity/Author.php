@@ -2,28 +2,26 @@
 
 namespace Instacar\ExtraFiltersBundle\App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource(
- *     collectionOperations={"get"},
- *     itemOperations={"get"},
- * )
- * @ORM\Entity()
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ],
+)]
+#[ORM\Entity]
 class Author
 {
-    /**
-     * @ORM\Id()
-     * @Orm\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(type: 'string')]
     private string $name;
 
     public function __construct(string $name)

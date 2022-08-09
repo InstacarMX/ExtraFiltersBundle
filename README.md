@@ -1,5 +1,5 @@
 # Instacar\ExtraFiltersBundle
-A Symfony Bundle for API Platform 2.6 to add a powerful filter based on Symfony Expressions, with support for virtual 
+A Symfony Bundle for API Platform 3.0 to add a powerful filter based on Symfony Expressions, with support for virtual 
 fields and composable filters.
 
 ## Before you go
@@ -67,12 +67,12 @@ Example with all the available filters:
 instacar_extra_filters:
   doctrine:
     filters:
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\SearchFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\RangeFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\DateFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\BooleanFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\NumericFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\ExistsFilter: false
 ```
 
 ## Usage
@@ -82,9 +82,9 @@ filters that the expression language have access to. For example:
 ```php
 // src/Entity/Book.php
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
@@ -124,7 +124,7 @@ Where:
 
 ### Supported filters
 - All the filters for API Platform for the ORM (currently tested SearchFilter and DateFilter).
-- Custom filters that implement the interface `ContextAwareFilterInterface` for the ORM.
+- Custom filters that implement the interface `FilterInterface` for the ORM.
 Note: The filter's name for the expression is in camelCase without the "Filter" suffix (for example, SearchFilter is
 converted to search).
 

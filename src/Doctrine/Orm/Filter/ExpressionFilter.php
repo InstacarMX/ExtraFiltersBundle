@@ -2,39 +2,37 @@
 
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-final class ExpressionFilter extends AbstractContextAwareFilter
+final class ExpressionFilter extends AbstractFilter
 {
     private ExpressionLanguage $expressionLanguage;
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param ExpressionLanguage $expressionLanguage
-     * @param RequestStack|null $requestStack
      * @param LoggerInterface|null $logger
      * @param array<string, string>|null $properties
-     * @param ContextAwareFilterInterface[] $filters
+     * @param FilterInterface[] $filters
      * @param NameConverterInterface|null $nameConverter
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ExpressionLanguage $expressionLanguage,
-        ?RequestStack $requestStack = null,
         LoggerInterface $logger = null,
         array $properties = null,
         array $filters = null,
         NameConverterInterface $nameConverter = null
     ) {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->expressionLanguage = $expressionLanguage;
         $this->expressionLanguage->registerProvider(new FilterExpressionProvider($filters));
@@ -59,16 +57,25 @@ final class ExpressionFilter extends AbstractContextAwareFilter
         return $description;
     }
 
+    /**
+     * @param string $property
+     * @param $value
+     * @param QueryBuilder $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string $resourceClass
+     * @param Operation|null $operation
+     * @param mixed[] $context
+     * @return void
+     */
     protected function filterProperty(
         string $property,
         $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        string $operationName = null
-        /*array $context = []*/
+        Operation $operation = null,
+        array $context = [],
     ): void {
-        $context = func_get_arg(6);
         if (($expression = $this->properties[$property] ?? null) === null) {
             return;
         }
@@ -76,7 +83,7 @@ final class ExpressionFilter extends AbstractContextAwareFilter
         try {
             $this->expressionLanguage->lint(
                 $expression,
-                ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operationName', 'context'],
+                ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operation', 'context'],
             );
 
             $queryExpression = $this->expressionLanguage->evaluate($expression, [
@@ -85,7 +92,7 @@ final class ExpressionFilter extends AbstractContextAwareFilter
                 'queryBuilder' => $queryBuilder,
                 'queryNameGenerator' => $queryNameGenerator,
                 'resourceClass' => $resourceClass,
-                'operationName' => $operationName,
+                'operation' => $operation,
                 'context' => $context,
             ]);
             $queryBuilder->andWhere($queryExpression);

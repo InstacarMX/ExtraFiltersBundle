@@ -2,7 +2,7 @@
 
 namespace Instacar\ExtraFiltersBundle\App;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Instacar\ExtraFiltersBundle\InstacarExtraFiltersBundle;
@@ -40,7 +40,7 @@ class Kernel extends BaseKernel
                 'orm' => [
                     'mappings' => [
                         'Test' => [
-                            'type' => 'annotation',
+                            'type' => 'attribute',
                             'dir' => '%kernel.project_dir%/src/Entity',
                             'prefix' => 'Instacar\ExtraFiltersBundle\App\Entity',
                         ],

@@ -2,57 +2,47 @@
 
 namespace Instacar\ExtraFiltersBundle\App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
-/**
- * @ApiResource(
- *     collectionOperations={"get"},
- *     itemOperations={"get"},
- * )
- * @ApiFilter(filterClass=ExpressionFilter::class, properties={
- *     "search"="orWhere(search('name', 'partial'), search('author.name', 'partial'))",
- *     "exclude"="notWhere(orWhere(search('name', 'partial'), search('author.name', 'partial')))",
- *     "budget"="range('price', null, {gte: (value - 50), lte: (value + 50)})",
- *     "available"="andWhere(date('availableStart', 'exclude_null', {before: value}),date('availableEnd', 'exclude_null', {after: value}))",
- * })
- * @ORM\Entity()
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ],
+)]
+#[ApiFilter(filterClass: ExpressionFilter::class, properties: [
+    'search' => 'orWhere(search("name", "partial"), search("author.name", "partial"))',
+    'exclude' => 'notWhere(orWhere(search("name", "partial"), search("author.name", "partial")))',
+    'budget' => 'range("price", null, {gte: (value - 50), lte: (value + 50)})',
+    'available' => 'andWhere(date("availableStart", "exclude_null", {before: value}),date("availableEnd", "exclude_null", {after: value}))',
+])]
+#[ORM\Entity]
 class Book
 {
-    /**
-     * @ORM\Id()
-     * @Orm\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(type: 'string')]
     private string $name;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private int $price;
 
-    /**
-     * @ORM\Column(type="date")
-     */
+    #[ORM\Column(type: 'date')]
     private \DateTimeInterface $availableStart;
 
-    /**
-     * @ORM\Column(type="date")
-     */
+    #[ORM\Column(type: 'date')]
     private \DateTimeInterface $availableEnd;
 
-    /**
-     * @ORM\ManyToOne()
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private Author $author;
 
     public function __construct(
@@ -60,7 +50,7 @@ class Book
         int $price,
         \DateTimeInterface $availableDateStart,
         \DateTimeInterface $availableDateEnd,
-        Author $author
+        Author $author,
     ) {
         $this->name = $name;
         $this->price = $price;

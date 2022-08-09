@@ -2,8 +2,9 @@
 
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionProviderInterface;
 use Instacar\ExtraFiltersBundle\Util\StringUtil;
@@ -12,12 +13,12 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
 {
     /**
-     * @var ContextAwareFilterInterface[]
+     * @var FilterInterface[]
      */
     protected array $filters;
 
     /**
-     * @param ContextAwareFilterInterface[] $filters
+     * @param FilterInterface[] $filters
      */
     public function __construct(array $filters)
     {
@@ -41,7 +42,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
                         $arguments['queryBuilder'],
                         $arguments['queryNameGenerator'],
                         $arguments['resourceClass'],
-                        $arguments['operationName'],
+                        $arguments['operation'],
                         $arguments['context'],
                     );
                 },
@@ -50,47 +51,45 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
     }
 
     /**
-     * @param ContextAwareFilterInterface $filter
+     * @param FilterInterface $filter
      * @param string $property
      * @param string|null $strategy
      * @param mixed $value
      * @param QueryBuilder $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string $resourceClass
-     * @param string|null $operationName
+     * @param Operation|null $operation
      * @param mixed[] $context
      * @return mixed
      */
     protected static function applyFilter(
-        ContextAwareFilterInterface $filter,
+        FilterInterface $filter,
         string $property,
         ?string $strategy,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        ?string $operationName,
-        array $context
-    ) {
+        ?Operation $operation,
+        array $context,
+    ): mixed {
         // Save and reset the where clause to obtain a untainted expression from the filter
         $originalWhere = $queryBuilder->getDQLPart('where');
         $queryBuilder->resetDQLPart('where');
 
         try {
-            // Trespass the property protection for $properties with reflection for PHP < 8.1
+            // Trespass the property protection for $properties with reflection
             $reflectionClass = new \ReflectionClass($filter);
             $reflectedProperty = $reflectionClass->getProperty('properties');
 
-            $reflectedProperty->setAccessible(true);
             $reflectedProperty->setValue($filter, [$property => $strategy]);
-            $reflectedProperty->setAccessible(false);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             // The property $properties does not exist, ignored it (maybe a custom filter)
         }
 
         // Bootstrap the context
         $context['filters'] = [$property => self::normalizeValue($value)];
-        $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
 
         // Save the generated expression from the filter and restore the where clause
         $expression = $queryBuilder->getDQLPart('where');
@@ -104,7 +103,7 @@ class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
      * @param mixed $value
      * @return string|mixed[]
      */
-    protected static function normalizeValue($value)
+    protected static function normalizeValue(mixed $value): string|array
     {
         if (!is_array($value)) {
             return (string) $value;
