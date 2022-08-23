@@ -59,6 +59,15 @@ final class ExpressionFilter extends AbstractContextAwareFilter
         return $description;
     }
 
+    /**
+     * @param string $property
+     * @param mixed $value
+     * @param QueryBuilder $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string $resourceClass
+     * @param string|null $operationName
+     * @return void
+     */
     protected function filterProperty(
         string $property,
         $value,

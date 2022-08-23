@@ -28,7 +28,8 @@
         "symfony/framework-bundle": "^5.4|^6.1",
         "symfony/http-client": "^5.4|^6.1",
         "symfony/phpunit-bridge": "^5.4|^6.1",
-        "symfony/runtime": "^5.4|^6.1"
+        "symfony/runtime": "^5.4|^6.1",
+        "symfony/twig-bundle": "^5.4|^6.1"
     },
     "autoload": {
         "psr-4": {
@@ -48,6 +49,9 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        }
+        },
+        "lint": "vendor/bin/phpcs",
+        "analyze": "vendor/bin/phpstan analyze",
+        "test": "bin/phpunit"
     }
 }
