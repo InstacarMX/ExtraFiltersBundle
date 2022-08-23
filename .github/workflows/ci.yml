@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches: [main, next]
+  pull_request:
+    branches: [main, next]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: [8.1]
+        prefer-lowest: [--prefer-lowest, '']
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+
+      - name: Setup php env 🏗
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: pdo_sqlite
+
+      - name: Validate composer.json ✔️
+        run: composer validate --strict
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache vendor 📦
+        if: ${{ !env.ACT }}
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.prefer-lowest }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.prefer-lowest }}-
+
+      - name: Install dependencies 👨🏻‍💻
+        run: |
+          composer require -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist ${{ matrix.prefer-lowest }} symfony/*
+
+      - name: Run linter 👀
+        run: composer run-script lint
+
+      - name: Check types 🔍
+        run: composer run-script analyze
+
+      - name: Run unit tests 🧪
+        run: composer run-script test

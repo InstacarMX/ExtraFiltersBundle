@@ -29,6 +29,9 @@
         <!-- DATABASE_URL="postgresql://symfony:ChangeMe@127.0.0.1:5432/app?serverVersion=13&amp;charset=utf8" -->
         <env name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/data.db"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
+
+        <!-- define your env variables for the test env here -->
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0"/>
     </php>
 
     <testsuites>

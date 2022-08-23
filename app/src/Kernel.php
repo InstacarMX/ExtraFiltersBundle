@@ -8,6 +8,7 @@ use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Instacar\ExtraFiltersBundle\InstacarExtraFiltersBundle;
 use Liip\TestFixturesBundle\LiipTestFixturesBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
@@ -26,6 +27,7 @@ class Kernel extends BaseKernel
             new DoctrineBundle(),
             new DoctrineFixturesBundle(),
             new LiipTestFixturesBundle(),
+            new TwigBundle(),
             new ApiPlatformBundle(),
             new InstacarExtraFiltersBundle(),
         ];

@@ -59,7 +59,7 @@ final class ExpressionFilter extends AbstractFilter
 
     /**
      * @param string $property
-     * @param $value
+     * @param mixed $value
      * @param QueryBuilder $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string $resourceClass
@@ -69,7 +69,7 @@ final class ExpressionFilter extends AbstractFilter
      */
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,

@@ -23,10 +23,12 @@ final class Configuration implements ConfigurationInterface
 
     private function addDoctrineOrmSection(ArrayNodeDefinition $rootNode): void
     {
+        $hasOrm = class_exists(DoctrineBundle::class) && interface_exists(EntityManagerInterface::class);
+
         $rootNode
             ->children()
                 ->arrayNode('doctrine')
-                    ->{class_exists(DoctrineBundle::class) && interface_exists(EntityManagerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$hasOrm ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->arrayNode('filters')
                             ->ignoreExtraKeys(false)

@@ -5,5 +5,5 @@ parameters:
     level: 6
     paths:
         - src/
-        - tests/src/
+        - app/src/
     tmpDir: .phpstan-cache
