@@ -49,7 +49,7 @@ jobs:
         run: composer run-script lint
 
       - name: Check types 🔍
-        run: composer run-script analyse
+        run: composer run-script analyze
 
       - name: Run unit tests 🧪
         run: composer run-script test
