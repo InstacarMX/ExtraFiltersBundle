@@ -23,7 +23,7 @@ final class ExpressionLanguage extends BaseExpressionLanguage
      * @param mixed[] $names
      * @return string
      */
-    public function compile($expression, array $names = []): string
+    public function compile(Expression|string $expression, array $names = []): string
     {
         throw new \RuntimeException('This expression language can not be cached');
     }

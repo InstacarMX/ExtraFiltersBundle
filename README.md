@@ -1,6 +1,10 @@
 # Instacar\ExtraFiltersBundle
-A Symfony Bundle for API Platform 2.6 to add a powerful filter based on Symfony Expressions, with support for virtual 
-fields and composable filters.
+A Symfony Bundle for API Platform to add a powerful filter based on Symfony Expressions, with support for virtual fields
+and composable filters.
+
+## Upgrading
+This version is for API Platform 2.7 and 3.0 with PHP 8.1 and Symfony 6.1. If you use API Platform 2.6, PHP 7.4 or
+Symfony 5.4, you must use the [v1](/InstacarMX/ExtraFiltersBundle/tree/v1) of this package.
 
 ## Before you go
 This is a WIP (Work-In-Progress), so you must expect breaking changes with the release of a new version. This software
@@ -67,12 +71,12 @@ Example with all the available filters:
 instacar_extra_filters:
   doctrine:
     filters:
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter: false
-      ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\SearchFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\RangeFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\DateFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\BooleanFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\NumericFilter: false
+      ApiPlatform\Doctrine\Orm\Filter\ExistsFilter: false
 ```
 
 ## Usage
@@ -82,9 +86,9 @@ filters that the expression language have access to. For example:
 ```php
 // src/Entity/Book.php
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 
@@ -124,7 +128,7 @@ Where:
 
 ### Supported filters
 - All the filters for API Platform for the ORM (currently tested SearchFilter and DateFilter).
-- Custom filters that implement the interface `ContextAwareFilterInterface` for the ORM.
+- Custom filters that implement the interface `FilterInterface` for the ORM.
 Note: The filter's name for the expression is in camelCase without the "Filter" suffix (for example, SearchFilter is
 converted to search).
 

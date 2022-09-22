@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: [7.4, 8.0, 8.1]
+        php-version: [8.1]
         prefer-lowest: [--prefer-lowest, '']
 
     steps:
@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies 👨🏻‍💻
         run: |
           composer require -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist ${{ matrix.prefer-lowest }} symfony/*
+          composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist ${{ matrix.prefer-lowest }} symfony/* api-platform/core
 
       - name: Run linter 👀
         run: composer run-script lint

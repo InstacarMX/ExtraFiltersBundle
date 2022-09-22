@@ -2,10 +2,11 @@
 
 namespace Instacar\ExtraFiltersBundle\App;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Instacar\ExtraFiltersBundle\InstacarExtraFiltersBundle;
+use Instacar\ExtraFiltersBundle\Test\Util\PackageVersion;
 use Liip\TestFixturesBundle\LiipTestFixturesBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -35,14 +36,28 @@ class Kernel extends BaseKernel
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
+        $isLegacyApiPlatform = PackageVersion::isLegacyApiPlatform();
+        $apiPlatformConfig = [
+            'mapping' => [
+                'paths' => ['%kernel.project_dir%/src/Entity'],
+            ],
+            'formats' => [
+                'json' => ['application/json'],
+            ],
+        ];
+
+        if ($isLegacyApiPlatform) {
+            $apiPlatformConfig['metadata_backward_compatibility_layer'] = false;
+        }
+
         $loader->load(dirname(__DIR__) . '/config/services.xml');
-        $loader->load(function (ContainerBuilder $container) {
+        $loader->load(function (ContainerBuilder $container) use ($apiPlatformConfig) {
             $container->loadFromExtension('doctrine', [
                 'dbal' => ['url' => '%env(resolve:DATABASE_URL)%'],
                 'orm' => [
                     'mappings' => [
                         'Test' => [
-                            'type' => 'annotation',
+                            'type' => 'attribute',
                             'dir' => '%kernel.project_dir%/src/Entity',
                             'prefix' => 'Instacar\ExtraFiltersBundle\App\Entity',
                         ],
@@ -56,14 +71,7 @@ class Kernel extends BaseKernel
                 'http_method_override' => false,
                 'test' => true,
             ]);
-            $container->loadFromExtension('api_platform', [
-                'mapping' => [
-                    'paths' => ['%kernel.project_dir%/src/Entity'],
-                ],
-                'formats' => [
-                    'json' => ['application/json'],
-                ],
-            ]);
+            $container->loadFromExtension('api_platform', $apiPlatformConfig);
         });
     }
 }

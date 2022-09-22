@@ -19,7 +19,6 @@
         <!-- Filters -->
         <service id="instacar.extra_filters.orm.expression_filter" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter" public="false" abstract="true">
             <argument type="service" id="doctrine"/>
-            <argument key="$requestStack">null</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="ignore"/>
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>

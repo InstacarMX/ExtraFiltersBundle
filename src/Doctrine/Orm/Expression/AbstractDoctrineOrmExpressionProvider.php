@@ -2,6 +2,7 @@
 
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression;
 
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
@@ -24,7 +25,7 @@ abstract class AbstractDoctrineOrmExpressionProvider implements ExpressionFuncti
                         $expressions,
                         $arguments['queryBuilder'],
                         $arguments['resourceClass'],
-                        $arguments['operationName'],
+                        $arguments['operation'],
                     );
                 },
             ),
@@ -35,8 +36,8 @@ abstract class AbstractDoctrineOrmExpressionProvider implements ExpressionFuncti
      * @param array<Expr\Andx|Expr\Orx|Expr\Comparison|Expr\Func> $expressions
      * @param QueryBuilder $queryBuilder
      * @param string $resourceClass
-     * @param string|null $operationName
+     * @param Operation|null $operation
      * @return mixed
      */
-    abstract public function apply(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName);
+    abstract public function apply(array $expressions, QueryBuilder $queryBuilder, string $resourceClass, ?Operation $operation): mixed;
 }
