@@ -2,6 +2,10 @@
 A Symfony Bundle for API Platform 2.6 to add a powerful filter based on Symfony Expressions, with support for virtual 
 fields and composable filters.
 
+## NOTE
+This is the v1 branch. If you want an API Platform 2.7 compatible package, go to
+[the main branch](/InstacarMX/ExtraFiltersBundle/tree/main).
+
 ## Before you go
 This is a WIP (Work-In-Progress), so you must expect breaking changes with the release of a new version. This software
 will try to stick with the semver conventions (trying to don't introduce backward-incompatible changes with the
