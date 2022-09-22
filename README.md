@@ -1,6 +1,10 @@
 # Instacar\ExtraFiltersBundle
-A Symfony Bundle for API Platform 3.0 to add a powerful filter based on Symfony Expressions, with support for virtual 
-fields and composable filters.
+A Symfony Bundle for API Platform to add a powerful filter based on Symfony Expressions, with support for virtual fields
+and composable filters.
+
+## Upgrading
+This version is for API Platform 2.7 and 3.0 with PHP 8.1 and Symfony 6.1. If you use API Platform 2.6, PHP 7.4 or
+Symfony 5.4, you must use the [v1](/InstacarMX/ExtraFiltersBundle/tree/v1) of this package.
 
 ## Before you go
 This is a WIP (Work-In-Progress), so you must expect breaking changes with the release of a new version. This software
