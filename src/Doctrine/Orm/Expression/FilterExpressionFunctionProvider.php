@@ -1,16 +1,15 @@
 <?php
 
-namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
+namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression;
 
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
-use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionProviderInterface;
 use Instacar\ExtraFiltersBundle\Util\StringUtil;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
-class FilterExpressionProvider implements DoctrineOrmExpressionProviderInterface
+class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionProviderInterface
 {
     /**
      * @var FilterInterface[]
