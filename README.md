@@ -80,8 +80,7 @@ instacar_extra_filters:
 ```
 
 ## Usage
-You can implement the ExpressionFilter as a normal filter for API Platform. You can pass in the arguments the
-filters that the expression language have access to. For example:
+You can implement the ExpressionFilter as a normal filter for API Platform. For example:
 
 ```php
 // src/Entity/Book.php
@@ -95,8 +94,6 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
 #[ApiResource]
 #[ApiFilter(ExpressionFilter::class, properties: [
     'search' => 'orWhere(search("name", "partial"), search("author.name", "partial"), search("year", "partial"))',
-], arguments: [
-    'filters' => [SearchFilter::class] // Only allow the ExpressionFilter to use the SearchFilter
 ])]
 #[ORM\Entity]
 class Book {

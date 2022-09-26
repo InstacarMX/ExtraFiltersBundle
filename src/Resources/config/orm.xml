@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <container xmlns="http://symfony.com/schema/dic/services">
     <services>
-        <service id="instacar.extra_filters.orm.expression_language" class="Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage" abstract="true" public="false">
+        <service id="instacar.extra_filters.orm.filter_provider" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\FilterExpressionProvider" public="false">
+            <tag>instacar.extra_filters.doctrine.orm.expression_provider</tag>
+        </service>
+        <service id="instacar.extra_filters.orm.expression_language" class="Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage" public="false">
             <argument type="tagged_iterator" tag="instacar.extra_filters.doctrine.orm.expression_provider"/>
         </service>
 
@@ -21,7 +24,8 @@
             <argument type="service" id="doctrine"/>
             <argument key="$logger" type="service" id="logger" on-invalid="ignore"/>
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+            <argument key="$expressionLanguage" type="service" id="instacar.extra_filters.orm.expression_language"/>
         </service>
-        <service id="Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter" alias="instacar.extra_filters.orm.expression_filter"/>
+        <service id="Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter" alias="instacar.extra_filters.orm.expression_filter" public="false"/>
     </services>
 </container>

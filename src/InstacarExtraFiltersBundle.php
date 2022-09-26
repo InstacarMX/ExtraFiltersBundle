@@ -2,7 +2,7 @@
 
 namespace Instacar\ExtraFiltersBundle;
 
-use Instacar\ExtraFiltersBundle\DependencyInjection\Compiler\ExpressionFilterPass;
+use Instacar\ExtraFiltersBundle\DependencyInjection\Compiler\FilterExpressionProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -12,6 +12,6 @@ final class InstacarExtraFiltersBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ExpressionFilterPass());
+        $container->addCompilerPass(new FilterExpressionProviderPass());
     }
 }

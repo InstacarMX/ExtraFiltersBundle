@@ -3,13 +3,12 @@
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
-use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Instacar\ExtraFiltersBundle\Doctrine\Common\Filter\ExpressionLanguage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 final class ExpressionFilter extends AbstractFilter
@@ -21,7 +20,6 @@ final class ExpressionFilter extends AbstractFilter
      * @param ExpressionLanguage $expressionLanguage
      * @param LoggerInterface|null $logger
      * @param array<string, string>|null $properties
-     * @param FilterInterface[] $filters
      * @param NameConverterInterface|null $nameConverter
      */
     public function __construct(
@@ -29,13 +27,11 @@ final class ExpressionFilter extends AbstractFilter
         ExpressionLanguage $expressionLanguage,
         LoggerInterface $logger = null,
         array $properties = null,
-        array $filters = null,
         NameConverterInterface $nameConverter = null
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->expressionLanguage = $expressionLanguage;
-        $this->expressionLanguage->registerProvider(new FilterExpressionProvider($filters));
     }
 
     /**

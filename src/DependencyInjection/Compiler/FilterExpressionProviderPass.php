@@ -11,37 +11,22 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-final class ExpressionFilterPass implements CompilerPassInterface
+final class FilterExpressionProviderPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
         $availableFilters = [
-            OrmExpressionFilter::class => $container->getParameter('instacar.extra_filters.doctrine.orm.filters'),
+            'orm' => $container->getParameter('instacar.extra_filters.doctrine.orm.filters'),
         ];
 
-        foreach ($container->findTaggedServiceIds('api_platform.filter', true) as $serviceId => $tags) {
-            $serviceDefinition = $container->getDefinition($serviceId);
-            $serviceClass = $serviceDefinition instanceof ChildDefinition
-                ? $serviceDefinition->getParent()
-                : $serviceDefinition->getClass();
-
-            if ($serviceClass !== OrmExpressionFilter::class) {
-                continue;
-            }
-
-            try {
-                $allowedFilters = $serviceDefinition->getArgument('$filters');
-            } catch (\OutOfBoundsException $e) {
-                $allowedFilters = $availableFilters[$serviceClass];
-            }
-
+        foreach ($availableFilters as $key => $allowedFilters) {
             if (empty($allowedFilters)) {
                 throw new \InvalidArgumentException('You must provide filters for the ExpressionFilter');
             }
 
             $filters = [];
             foreach ($allowedFilters as $filterClass) {
-                $id = $serviceId . '_' . Inflector::tableize(str_replace('\\', '', $filterClass));
+                $id = 'expression_filter_' . Inflector::tableize(str_replace('\\', '', $filterClass));
 
                 if ($container->has($id)) {
                     continue;
@@ -64,11 +49,9 @@ final class ExpressionFilterPass implements CompilerPassInterface
                 $container->setDefinition($id, $definition);
             }
 
-            if ($serviceClass === OrmExpressionFilter::class) {
-                $expressionLanguageDefinition = new ChildDefinition('instacar.extra_filters.orm.expression_language');
-
-                $serviceDefinition->setArgument('$expressionLanguage', $expressionLanguageDefinition);
-                $serviceDefinition->setArgument('$filters', $filters);
+            if ($key === 'orm') {
+                $filterProviderDefinition = $container->getDefinition('instacar.extra_filters.orm.filter_provider');
+                $filterProviderDefinition->setArgument('$filters', $filters);
             }
         }
     }
