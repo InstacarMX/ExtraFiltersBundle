@@ -83,6 +83,14 @@ class TestExpressionFilter extends ApiTestCase
                                         'type' => 'string',
                                     ],
                                 ],
+                                [
+                                    'name' => 'owned',
+                                    'in' => 'query',
+                                    'required' => false,
+                                    'schema' => [
+                                        'type' => 'string',
+                                    ],
+                                ],
                             ],
                         ]
                     ]
@@ -113,6 +121,12 @@ class TestExpressionFilter extends ApiTestCase
                                 ],
                                 [
                                     'name' => 'available',
+                                    'in' => 'query',
+                                    'required' => false,
+                                    'type' => 'string',
+                                ],
+                                [
+                                    'name' => 'owned',
                                     'in' => 'query',
                                     'required' => false,
                                     'type' => 'string',
