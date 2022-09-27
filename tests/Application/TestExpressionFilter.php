@@ -3,19 +3,27 @@
 namespace Instacar\ExtraFiltersBundle\Test\Application;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 use Instacar\ExtraFiltersBundle\App\DataFixtures\BookFixture;
+use Instacar\ExtraFiltersBundle\App\Entity\User;
 use Instacar\ExtraFiltersBundle\Test\Util\PackageVersion;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 
 class TestExpressionFilter extends ApiTestCase
 {
+    protected EntityManagerInterface $entityManager;
+
     protected AbstractDatabaseTool $databaseTool;
 
     protected function setUp(): void
     {
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         /** @var DatabaseToolCollection $databaseTool */
         $databaseTool = self::getContainer()->get(DatabaseToolCollection::class);
+
+        $this->entityManager = $entityManager;
         $this->databaseTool = $databaseTool->get();
     }
 
@@ -145,6 +153,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+                'createdBy' => '/users/1',
             ],
         ]);
 
@@ -161,6 +170,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/1',
             ],
             [
                 'id' => 3,
@@ -169,6 +179,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-02-01T00:00:00+00:00',
                 'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/2',
             ],
         ]);
     }
@@ -194,6 +205,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/1',
             ],
             [
                 'id' => 3,
@@ -202,6 +214,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-02-01T00:00:00+00:00',
                 'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/2',
             ],
         ]);
 
@@ -218,6 +231,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+                'createdBy' => '/users/1',
             ],
         ]);
     }
@@ -243,6 +257,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+                'createdBy' => '/users/1',
             ],
             [
                 'id' => 2,
@@ -251,6 +266,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/1',
             ],
         ]);
     }
@@ -276,6 +292,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+                'createdBy' => '/users/1',
             ],
             [
                 'id' => 2,
@@ -284,6 +301,47 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/1',
+            ],
+        ]);
+    }
+
+    public function testOwnedExpressionFilter(): void
+    {
+        /** @var  $userRepository */
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+        $client->loginUser($adminUser);
+
+        $client->request('GET', '/books?owned=true', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'price' => 120,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+                'createdBy' => '/users/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'price' => 180,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+                'createdBy' => '/users/1',
             ],
         ]);
     }
@@ -309,6 +367,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/1',
             ],
         ]);
     }
@@ -334,6 +393,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/1',
+                'createdBy' => '/users/1',
             ],
             [
                 'id' => 2,
@@ -342,6 +402,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-01-01T00:00:00+00:00',
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/1',
             ],
             [
                 'id' => 3,
@@ -350,6 +411,7 @@ class TestExpressionFilter extends ApiTestCase
                 'availableStart' => '2022-02-01T00:00:00+00:00',
                 'availableEnd' => '2022-02-28T00:00:00+00:00',
                 'author' => '/authors/2',
+                'createdBy' => '/users/2',
             ],
         ]);
     }
@@ -358,6 +420,8 @@ class TestExpressionFilter extends ApiTestCase
     {
         parent::tearDown();
 
-        unset($this->databaseTool);
+        $this->entityManager->close();
+
+        unset($this->entityManager, $this->databaseTool);
     }
 }

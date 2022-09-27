@@ -20,6 +20,7 @@ use Instacar\ExtraFiltersBundle\Doctrine\Orm\Filter\ExpressionFilter;
     'exclude' => 'notWhere(orWhere(search("name", "partial"), search("author.name", "partial")))',
     'budget' => 'range("price", null, {gte: (value - 50), lte: (value + 50)})',
     'available' => 'andWhere(date("availableStart", "exclude_null", {before: value}),date("availableEnd", "exclude_null", {after: value}))',
+    'owned' => 'search("createdBy", "exact", user)',
 ])]
 #[ORM\Entity]
 class Book
@@ -45,18 +46,24 @@ class Book
     #[ORM\JoinColumn(nullable: false)]
     private Author $author;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $createdBy;
+
     public function __construct(
         string $name,
         int $price,
         \DateTimeInterface $availableDateStart,
         \DateTimeInterface $availableDateEnd,
         Author $author,
+        User $createdBy,
     ) {
         $this->name = $name;
         $this->price = $price;
         $this->availableStart = $availableDateStart;
         $this->availableEnd = $availableDateEnd;
         $this->author = $author;
+        $this->createdBy = $createdBy;
     }
 
     public function getId(): ?int
@@ -112,5 +119,15 @@ class Book
     public function setAuthor(Author $author): void
     {
         $this->author = $author;
+    }
+
+    public function getCreatedBy(): User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(User $createdBy): void
+    {
+        $this->createdBy = $createdBy;
     }
 }
