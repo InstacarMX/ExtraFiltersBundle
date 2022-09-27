@@ -50,7 +50,7 @@ final class FilterExpressionProviderPass implements CompilerPassInterface
             }
 
             if ($key === 'orm') {
-                $filterProviderDefinition = $container->getDefinition('instacar.extra_filters.orm.filter_provider');
+                $filterProviderDefinition = $container->getDefinition('instacar.extra_filters.orm.filter_expression_function_provider');
                 $filterProviderDefinition->setArgument('$filters', $filters);
             }
         }

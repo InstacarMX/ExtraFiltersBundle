@@ -25,10 +25,12 @@
         "roave/security-advisories": "dev-latest",
         "squizlabs/php_codesniffer": "^3.7",
         "symfony/browser-kit": "^6.1",
+        "symfony/flex": "^2.2",
         "symfony/framework-bundle": "^6.1",
         "symfony/http-client": "^6.1",
         "symfony/phpunit-bridge": "^6.1",
         "symfony/runtime": "^6.1",
+        "symfony/security-bundle": "^6.1",
         "symfony/twig-bundle": "^6.1"
     },
     "autoload": {
@@ -45,12 +47,18 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "symfony/flex": true
         }
     },
     "scripts": {
         "lint": "vendor/bin/phpcs",
         "analyze": "vendor/bin/phpstan analyze",
         "test": "bin/phpunit"
+    },
+    "extra": {
+        "symfony": {
+            "docker": false
+        }
     }
 }

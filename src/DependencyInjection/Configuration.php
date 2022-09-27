@@ -5,9 +5,11 @@ namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 use ApiPlatform\Doctrine\Orm\Filter as OrmFilter;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 final class Configuration implements ConfigurationInterface
 {
@@ -16,9 +18,24 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('instacar_extra_filters');
         $rootNode = $treeBuilder->getRootNode();
 
+        $this->addSecuritySection($rootNode);
         $this->addDoctrineOrmSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addSecuritySection(ArrayNodeDefinition $rootNode): void
+    {
+        $hasSecurity = class_exists(SecurityBundle::class) && interface_exists(UserInterface::class);
+
+        $rootNode
+            ->children()
+                ->arrayNode('security')
+                    ->{$hasSecurity ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addDoctrineOrmSection(ArrayNodeDefinition $rootNode): void

@@ -118,6 +118,10 @@ Where:
 - **value:** The value passed to the filter. Optional. You can manipulate the value before pass it to the filter with 
   this property, for example with the DateFilter you can search old dates with `{before: value}`.
 
+### Allowed values
+- **user:** Equal to the current Symfony user.
+- **token:** Equal to the curren Symfony security token.
+
 ### Supported operators
 - **andWhere:** Equal to the SQL operator "AND".
 - **orWhere:** Equal to the SQL operator "OR".

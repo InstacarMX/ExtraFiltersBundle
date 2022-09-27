@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services">
+    <services>
+        <service id="instacar.extra_filters.security_expression_value_provider" class="Instacar\ExtraFiltersBundle\Expression\SecurityExpressionValueProvider" public="false">
+            <argument key="$security" type="service" id="Symfony\Component\Security\Core\Security"/>
+            <tag>instacar.extra_filters.expression_value_provider</tag>
+        </service>
+    </services>
+</container>

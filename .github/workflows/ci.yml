@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         php-version: [8.1]
+        symfony-version: [6.1.*]
         prefer-lowest: [--prefer-lowest, '']
 
     steps:
@@ -37,10 +38,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ matrix.prefer-lowest }}-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-${{ matrix.prefer-lowest }}-
+          key: ${{ runner.os }}-composer-${{ matrix.symfony-version }}-${{ matrix.prefer-lowest }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.symfony-version }}-${{ matrix.prefer-lowest }}-
 
       - name: Install dependencies 👨🏻‍💻
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony-version }}
         run: |
           composer require -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist ${{ matrix.prefer-lowest }} symfony/* api-platform/core

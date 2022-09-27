@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services">
+    <services>
+        <service id="instacar.extra_filters.expression_language" class="Instacar\ExtraFiltersBundle\Expression\ExpressionLanguage" abstract="true" public="false">
+            <argument key="$valueProviders" type="tagged_iterator" tag="instacar.extra_filters.expression_value_provider"/>
+        </service>
+    </services>
+</container>

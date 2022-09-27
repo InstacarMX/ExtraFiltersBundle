@@ -5,10 +5,12 @@ namespace Instacar\ExtraFiltersBundle\App;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
+use Instacar\ExtraFiltersBundle\App\Entity\User;
 use Instacar\ExtraFiltersBundle\InstacarExtraFiltersBundle;
 use Instacar\ExtraFiltersBundle\Test\Util\PackageVersion;
 use Liip\TestFixturesBundle\LiipTestFixturesBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,6 +28,7 @@ class Kernel extends BaseKernel
         return [
             new FrameworkBundle(),
             new DoctrineBundle(),
+            new SecurityBundle(),
             new DoctrineFixturesBundle(),
             new LiipTestFixturesBundle(),
             new TwigBundle(),
@@ -70,6 +73,22 @@ class Kernel extends BaseKernel
                 'secret' => '%env(APP_SECRET)%',
                 'http_method_override' => false,
                 'test' => true,
+            ]);
+            $container->loadFromExtension('security', [
+                'providers' => [
+                    'app_user_provider' => [
+                        'entity' => [
+                            'class' => User::class,
+                            'property' => 'username',
+                        ],
+                    ],
+                ],
+                'firewalls' => [
+                    'main' => [
+                        'stateless' => true,
+                        'provider' => 'app_user_provider',
+                    ],
+                ],
             ]);
             $container->loadFromExtension('api_platform', $apiPlatformConfig);
         });

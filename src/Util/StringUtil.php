@@ -2,6 +2,9 @@
 
 namespace Instacar\ExtraFiltersBundle\Util;
 
+/**
+ * @internal
+ */
 final class StringUtil
 {
     public static function removeSuffix(string $string, string $suffix): string
