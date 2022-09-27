@@ -77,11 +77,6 @@ final class ExpressionFilter extends AbstractFilter
         }
 
         try {
-            $this->expressionLanguage->lint(
-                $expression,
-                ['property', 'value', 'queryBuilder', 'queryNameGenerator', 'resourceClass', 'operation', 'context'],
-            );
-
             $queryExpression = $this->expressionLanguage->evaluate($expression, [
                 'property' => $property,
                 'value' => $value,

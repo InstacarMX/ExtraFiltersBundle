@@ -3,7 +3,6 @@
 namespace Instacar\ExtraFiltersBundle\DependencyInjection;
 
 use Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\DoctrineOrmExpressionFunctionProviderInterface;
-use Instacar\ExtraFiltersBundle\Expression\ExpressionFunctionProviderInterface;
 use Instacar\ExtraFiltersBundle\Expression\ExpressionValueProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

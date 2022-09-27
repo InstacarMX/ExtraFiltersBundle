@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <container xmlns="http://symfony.com/schema/dic/services">
     <services>
-        <service id="instacar.extra_filters.orm.filter_expression_function_provider" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\FilterExpressionFunctionProvider" public="false">
-            <tag>instacar.extra_filters.doctrine.orm.expression_function_provider</tag>
-        </service>
+        <service id="instacar.extra_filters.orm.filter_expression_function_provider" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\FilterExpressionFunctionProvider" public="false" autowire="true"/>
         <service id="instacar.extra_filters.orm.expression_language" parent="instacar.extra_filters.expression_language" public="false">
             <argument key="$functionProviders" type="tagged_iterator" tag="instacar.extra_filters.doctrine.orm.expression_function_provider"/>
         </service>

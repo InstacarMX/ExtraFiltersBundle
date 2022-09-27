@@ -33,7 +33,7 @@ final class ExpressionLanguage extends BaseExpressionLanguage
     public function evaluate(Expression|string $expression, array $values = []): mixed
     {
         foreach ($this->valueProviders as $valueProvider) {
-            array_push($values, ...$valueProvider->getValues());
+            $values += $valueProvider->getValues();
         }
 
         return parent::evaluate($expression, $values);

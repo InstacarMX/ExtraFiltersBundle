@@ -2,12 +2,16 @@
 
 namespace Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression;
 
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Instacar\ExtraFiltersBundle\Util\StringUtil;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionProviderInterface
 {
@@ -16,24 +20,30 @@ class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionP
      */
     protected array $filters;
 
+    protected IriConverterInterface $iriConverter;
+
+    protected PropertyAccessorInterface $propertyAccessor;
+
     /**
      * @param FilterInterface[] $filters
      */
-    public function __construct(array $filters)
+    public function __construct(array $filters, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->filters = $filters;
+        $this->iriConverter = $iriConverter;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     public function getFunctions(): array
     {
-        return array_map(static function ($filter) {
+        return array_map(function ($filter) {
             return new ExpressionFunction(
-                self::normalizeFilterName(get_class($filter)),
+                $this->normalizeFilterName(get_class($filter)),
                 static function () {
                     // Uncompilable
                 },
-                static function ($arguments, string $property = null, string $strategy = null, $value = null) use ($filter) {
-                    return self::applyFilter(
+                function ($arguments, string $property = null, string $strategy = null, $value = null) use ($filter) {
+                    return $this->applyFilter(
                         $filter,
                         $property ?? $arguments['property'],
                         $strategy,
@@ -61,7 +71,7 @@ class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionP
      * @param mixed[] $context
      * @return mixed
      */
-    protected static function applyFilter(
+    protected function applyFilter(
         FilterInterface $filter,
         string $property,
         ?string $strategy,
@@ -87,7 +97,7 @@ class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionP
         }
 
         // Bootstrap the context
-        $context['filters'] = [$property => self::normalizeValue($value)];
+        $context['filters'] = [$property => $this->normalizeValue($value)];
         $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
 
         // Save the generated expression from the filter and restore the where clause
@@ -102,26 +112,41 @@ class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionP
      * @param mixed $value
      * @return string|mixed[]
      */
-    protected static function normalizeValue(mixed $value): string|array
+    protected function normalizeValue(mixed $value): string|array
     {
-        if (!is_array($value)) {
-            return (string) $value;
+        if (is_object($value)) {
+            return $this->getIriFromResource($value);
+        }
+        if (is_array($value)) {
+            $normalizedArray = [];
+            foreach ($value as $key => $item) {
+                $normalizedArray[$key] = self::normalizeValue($item);
+            }
+
+            return $normalizedArray;
         }
 
-        $normalizedArray = [];
-        foreach ($value as $key => $item) {
-            $normalizedArray[$key] = self::normalizeValue($item);
-        }
-
-        return $normalizedArray;
+        return (string) $value;
     }
 
-    protected static function normalizeFilterName(string $className): string
+    protected function normalizeFilterName(string $className): string
     {
         $classNamespace = explode('\\', $className);
         $shortName = $classNamespace[count($classNamespace) - 1];
         $shortName = StringUtil::removeSuffix($shortName, 'Filter');
 
         return lcfirst($shortName);
+    }
+
+    protected function getIriFromResource(object $value): string
+    {
+        // Extracted from SearchFilterTrait of API Platform
+        try {
+            return $this->iriConverter->getIriFromResource($value);
+        } catch (InvalidArgumentException) {
+            // Do nothing, try to cast to string
+        }
+
+        return (string) $value;
     }
 }

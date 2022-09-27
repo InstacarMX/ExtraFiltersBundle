@@ -9,7 +9,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 final class Configuration implements ConfigurationInterface
 {
@@ -26,7 +26,7 @@ final class Configuration implements ConfigurationInterface
 
     private function addSecuritySection(ArrayNodeDefinition $rootNode): void
     {
-        $hasSecurity = class_exists(SecurityBundle::class) && interface_exists(Security::class);
+        $hasSecurity = class_exists(SecurityBundle::class) && interface_exists(UserInterface::class);
 
         $rootNode
             ->children()

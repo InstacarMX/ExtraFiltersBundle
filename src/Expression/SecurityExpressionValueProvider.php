@@ -16,8 +16,8 @@ final class SecurityExpressionValueProvider implements ExpressionValueProviderIn
     public function getValues(): array
     {
         return [
-            'token' => $this->security->getToken(),
-            'user' => $this->security->getUser(),
+            'token' => $this->security->getToken() ?? 'anon',
+            'user' => $this->security->getUser() ?? 'anon',
         ];
     }
 }
