@@ -322,7 +322,6 @@ class TestExpressionFilter extends ApiTestCase
 
     public function testOwnedExpressionFilter(): void
     {
-        /** @var  $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
 
@@ -333,7 +332,7 @@ class TestExpressionFilter extends ApiTestCase
         $client = static::createClient();
         $client->loginUser($adminUser);
 
-        $client->request('GET', '/books?owned=true', [
+        $client->request('GET', '/books?owned', [
             'headers' => ['accept' => 'application/json'],
         ]);
         self::assertResponseIsSuccessful();
@@ -356,6 +355,98 @@ class TestExpressionFilter extends ApiTestCase
                 'availableEnd' => '2022-01-31T00:00:00+00:00',
                 'author' => '/authors/2',
                 'createdBy' => '/users/1',
+            ],
+        ]);
+    }
+
+    public function testInvalidFilterValue(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        $client->request('GET', '/books?budget=invalid', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'price' => 120,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+                'createdBy' => '/users/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'price' => 180,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+                'createdBy' => '/users/1',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Symfony 6: The right way',
+                'price' => 250,
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
+                'author' => '/authors/2',
+                'createdBy' => '/users/2',
+            ],
+        ]);
+    }
+
+    public function testInvalidInjectedFilterValue(): void
+    {
+        $this->databaseTool->loadFixtures([
+            BookFixture::class,
+        ]);
+
+        $client = static::createClient();
+
+        /*
+         * This filter use the current user, so because the property is not null and the user is not set, it should
+         * thrown an internal error in the search filter
+         */
+        $client->request('GET', '/books?owned', [
+            'headers' => ['accept' => 'application/json'],
+        ]);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        self::assertJsonEquals([
+            [
+                'id' => 1,
+                'name' => 'PHP for dummies',
+                'price' => 120,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/1',
+                'createdBy' => '/users/1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'How to test',
+                'price' => 180,
+                'availableStart' => '2022-01-01T00:00:00+00:00',
+                'availableEnd' => '2022-01-31T00:00:00+00:00',
+                'author' => '/authors/2',
+                'createdBy' => '/users/1',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Symfony 6: The right way',
+                'price' => 250,
+                'availableStart' => '2022-02-01T00:00:00+00:00',
+                'availableEnd' => '2022-02-28T00:00:00+00:00',
+                'author' => '/authors/2',
+                'createdBy' => '/users/2',
             ],
         ]);
     }

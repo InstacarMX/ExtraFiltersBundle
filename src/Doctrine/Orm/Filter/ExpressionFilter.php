@@ -86,8 +86,11 @@ final class ExpressionFilter extends AbstractFilter
                 'operation' => $operation,
                 'context' => $context,
             ]);
-            $queryBuilder->andWhere($queryExpression);
-        } catch (\Exception $e) {
+
+            if ($queryExpression) {
+                $queryBuilder->andWhere($queryExpression);
+            }
+        } catch (\Exception | \Error $e) {
             $this->logger->notice('Invalid filter ignored', ['exception' => $e]);
         }
     }

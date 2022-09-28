@@ -102,7 +102,7 @@ class FilterExpressionFunctionProvider implements DoctrineOrmExpressionFunctionP
 
         // Save the generated expression from the filter and restore the where clause
         $expression = $queryBuilder->getDQLPart('where');
-        $queryBuilder->where($originalWhere);
+        $queryBuilder->add('where', $originalWhere);
 
         return $expression;
     }
