@@ -2,7 +2,7 @@
 <container xmlns="http://symfony.com/schema/dic/services">
     <services>
         <service id="instacar.extra_filters.orm.filter_expression_function_provider" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\FilterExpressionFunctionProvider" public="false" autowire="true">
-            <tag>instacar.extra_filters.doctrine.orm.expression_function_provider</tag>
+            <tag name="instacar.extra_filters.doctrine.orm.expression_function_provider" />
         </service>
         <service id="instacar.extra_filters.orm.expression_language" parent="instacar.extra_filters.expression_language" public="false">
             <argument key="$functionProviders" type="tagged_iterator" tag="instacar.extra_filters.doctrine.orm.expression_function_provider"/>
@@ -10,13 +10,13 @@
 
         <!-- Expressions -->
         <service id="instacar.extra_filters.orm.and_expression" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\AndExpression" public="false">
-            <tag>instacar.extra_filters.doctrine.orm.expression_function_provider</tag>
+            <tag name="instacar.extra_filters.doctrine.orm.expression_function_provider" />
         </service>
         <service id="instacar.extra_filters.orm.or_expression" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\OrExpression" public="false">
-            <tag>instacar.extra_filters.doctrine.orm.expression_function_provider</tag>
+            <tag name="instacar.extra_filters.doctrine.orm.expression_function_provider" />
         </service>
         <service id="instacar.extra_filters.orm.not_expression" class="Instacar\ExtraFiltersBundle\Doctrine\Orm\Expression\NotExpression" public="false">
-            <tag>instacar.extra_filters.doctrine.orm.expression_function_provider</tag>
+            <tag name="instacar.extra_filters.doctrine.orm.expression_function_provider" />
         </service>
 
         <!-- Filters -->
