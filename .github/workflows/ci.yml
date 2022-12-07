@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         php-version: [8.1]
-        symfony-version: [6.1.*]
+        symfony-version: [6.1.*, 6.2.*]
         prefer-lowest: [--prefer-lowest, '']
 
     steps:
