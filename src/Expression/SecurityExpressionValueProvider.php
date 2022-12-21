@@ -2,13 +2,14 @@
 
 namespace Instacar\ExtraFiltersBundle\Expression;
 
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Security as LegacySecurity;
 
 final class SecurityExpressionValueProvider implements ExpressionValueProviderInterface
 {
-    private Security $security;
+    private Security|LegacySecurity $security;
 
-    public function __construct(Security $security)
+    public function __construct(Security|LegacySecurity $security)
     {
         $this->security = $security;
     }

@@ -7,3 +7,7 @@ parameters:
         - src/
         - app/src/
     tmpDir: .phpstan-cache
+    ignoreErrors:
+        - message: '#Symfony\\Bundle\\SecurityBundle\\Security#'
+          path: src/Expression/SecurityExpressionValueProvider.php
+          reportUnmatched: false
