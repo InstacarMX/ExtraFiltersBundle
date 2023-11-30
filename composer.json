@@ -28,7 +28,7 @@
         "symfony/flex": "^2.2",
         "symfony/framework-bundle": "^6.1",
         "symfony/http-client": "^6.1",
-        "symfony/phpunit-bridge": "^6.1",
+        "symfony/phpunit-bridge": "^7.0",
         "symfony/runtime": "^6.1",
         "symfony/security-bundle": "^6.1",
         "symfony/twig-bundle": "^6.1"
